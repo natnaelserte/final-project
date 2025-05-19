@@ -1,0 +1,527 @@
+/* General Styling from your provided CSS */
+:root {
+    --primary-color: rgba(30, 110, 157, 0.9);
+    --secondary-color: #9add53; /* Greenish, might be good for "selected" or positive actions */
+    --text-color: white; /* Primarily for dark backgrounds as per your nav */
+    --link-hover-color: #48CAE4;
+    --active-link-underline-color: rgb(14, 171, 233);
+    --background-gradient-start: rgba(26, 29, 38, 0.5);
+    --responsive-font-size: clamp(1rem, 2.5vw, 1.5rem); /* Adjusted for content readability */
+
+    /* Additional colors for the voting page for a two-color scheme (primary + white/grays) */
+    --vote-page-bg: #ffffff;
+    --vote-container-bg: #f8f9fa; /* Very light gray for position containers */
+    --vote-text-dark: #212529;
+    --vote-text-medium: #495057;
+    --vote-text-light: #6c757d;
+    --vote-border-color: #dee2e6;
+}
+
+body {
+    font-family: 'Roboto', sans-serif; /* Added from previous iteration */
+    font-size: 1rem;
+    color: var(--vote-text-medium); /* Default text color for light backgrounds */
+    background-color: var(--vote-page-bg); /* White background for voting page content area */
+    margin: 0;
+    padding: 0;
+}
+
+/* Header - Your existing .navheader styles */
+.navheader {
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* Ensures it's above other content */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background: var(--primary-color); /* Define this in your :root */
+    padding: 15px 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+.navheader .navbar-brand {
+    color: var(--text-color);
+    font-weight: bold;
+    font-size: 2rem;
+    text-decoration: none;
+    margin-bottom: 0;
+}
+
+.navbar-toggler {
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+}
+
+.navbar-toggler:focus {
+    outline: none !important;
+}
+
+.navbar-toggler-icon {
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: middle;
+    content: "";
+    background: none;
+    cursor: pointer;
+}
+
+.navbar-toggler-icon::before {
+    content: '\2630';
+    color: var(--text-color); /* Changed to var(--text-color) for consistency */
+    font-size: 2rem;
+    line-height: 1;
+    transition: color 0.3s ease-in-out;
+    display: block;
+    margin: auto;
+}
+
+.navheader .collapse {
+    text-align: center;
+    width: 100%;
+    margin: 10px 0;
+}
+
+.navheader .navbar-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.navheader .nav-item {
+    list-style: none;
+    padding: 10px 20px;
+    position: relative;
+    border-radius: 10px;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    overflow: hidden;
+    width: auto;
+    margin: 5px 0;
+}
+
+.navheader .nav-item::before,
+.navheader .nav-item::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    background: var(--text-color);
+    transition: width 0.3s ease;
+}
+
+.navheader .nav-item::before {
+    top: 0;
+    left: 0;
+}
+
+.navheader .nav-item::after {
+    bottom: 0;
+    right: 0;
+}
+
+.navheader .nav-item span {
+    content: "";
+    position: absolute;
+    width: 2px;
+    height: 0;
+    background: var(--text-color);
+    transition: height 0.3s ease;
+}
+
+.navheader .nav-item span:first-child {
+    left: 0;
+    top: 0;
+}
+
+.navheader .nav-item span:last-child {
+    right: 0;
+    bottom: 0;
+}
+
+.navheader .nav-item:hover::before,
+.navheader .nav-item:hover::after {
+    width: 100%;
+}
+
+.navheader .nav-item:hover span:first-child,
+.navheader .nav-item:hover span:last-child {
+    height: 100%;
+}
+
+.navheader .nav-item:hover {
+    transform: scale(1.1);
+}
+
+.navheader .nav-item .nav-link {
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 2.5rem;
+    transition: color 0.3s ease-in-out;
+    display: block;
+    padding: 5px 10px;
+}
+
+.navheader .nav-link:hover {
+    color: var(--secondary-color);
+}
+
+.navheader .nav-link.active {
+    text-decoration: none;
+    position: relative;
+    pointer-events: none;
+}
+
+.navheader .nav-link.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 2px;
+    background-color: var(--active-link-underline-color);
+}
+
+@media (min-width: 992px) {
+    .navheader {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+    }
+    .navbar-toggler { display: none; }
+    .navheader .collapse { text-align: right; width: auto; }
+    .navheader .navbar-nav { flex-direction: row; }
+    .navheader .nav-item { margin: 0; }
+    .navheader .nav-link { font-size: 1.2rem; }
+}
+
+
+/* --- Voting Page Specific Styles --- */
+
+/* Wrapper for the main content area of the voting page, used with sidebar */
+/* #wrapper_1 is already in your CSS, applying gradient background */
+/* if sidebar is present, this #wrapper_1 might need to have display:flex with the sidebar */
+
+.container_vote_content { /* Specific container for the voting form area within #wrapper_1 */
+    padding: 20px; /* Bootstrap's .container already has padding, adjust as needed */
+    flex-grow: 1; /* If inside a flex container like #wrapper_1 with a sidebar */
+    width: 100%;
+    max-width: 1200px; /* Optional: constrain max width */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.main-voting-title {
+    color: var(--primary-color); /* Use primary color for the main title */
+    font-weight: 700;
+    font-size: clamp(1.8rem, 4vw, 2.5rem); /* Responsive font size */
+    margin-bottom: 2.5rem !important; /* More space below title */
+}
+
+/* .position-container is already in your CSS, let's ensure it fits the theme */
+.position-container {
+    background-color: var(--vote-container-bg); /* Light gray for contrast against white page */
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--vote-border-color);
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* .position-title is already in your CSS */
+.position-title {
+    color: var(--primary-color); /* Use primary color */
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+    margin-bottom: 25px !important; /* Increased margin */
+    text-align: center;
+    font-size: clamp(1.4rem, 3vw, 1.8rem); /* Responsive font size */
+    font-weight: 500;
+}
+
+/* .candidate-card is already in your CSS, let's refine for the new theme */
+.candidate-card {
+    background-color: var(--vote-page-bg); /* White background for cards */
+    border: 1px solid var(--vote-border-color);
+    border-radius: 8px;
+    transition: box-shadow 0.3s ease;
+    height: 100%; /* For equal height cards in a row */
+    display: flex;
+    flex-direction: column;
+}
+
+.candidate-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px); /* Keep subtle lift */
+}
+
+.candidate-card .card-img-top {
+    width: 100%;
+    height: 180px; /* Reduced height for image */
+    object-fit: cover; /* Fills the container, may crop */
+    border-top-left-radius: calc(8px - 1px);
+    border-top-right-radius: calc(8px - 1px);
+}
+
+.candidate-card .card-body {
+    padding: 1rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Pushes button to bottom */
+}
+
+.candidate-card .card-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--vote-text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.candidate-card .card-text {
+    font-size: 0.9rem;
+    color: var(--vote-text-light);
+    line-height: 1.4;
+    margin-bottom: 1rem;
+}
+
+/* Custom checkbox styling for the voting page */
+.candidate-checkbox-input { /* The actual hidden checkbox */
+    display: none;
+}
+
+.custom-vote-checkbox-label {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--primary-color);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-align: center;
+    background-color: transparent; /* Transparent background initially */
+    color: var(--primary-color);
+}
+
+.custom-vote-checkbox-label:hover {
+    background-color: var(--primary-color);
+    color: var(--text-color); /* White text on hover */
+}
+
+.candidate-checkbox-input:checked + .custom-vote-checkbox-label {
+    background-color: var(--primary-color);
+    color: var(--text-color); /* White text when checked */
+    font-weight: 700;
+}
+
+.candidate-checkbox-input:disabled + .custom-vote-checkbox-label {
+    background-color: #e9ecef; /* Standard disabled light gray */
+    color: var(--vote-text-light);
+    cursor: not-allowed;
+    border-color: var(--vote-border-color);
+}
+
+/* .vote-btn from your new CSS - Ensure it's styled correctly */
+.vote-btn { /* This class is from your provided new CSS */
+    padding: 12px 30px !important; /* Bootstrap .btn might override, use !important if needed */
+    font-size: var(--responsive-font-size) !important;
+    font-weight: bold !important;
+    color: var(--text-color) !important;
+    background: var(--primary-color) !important; /* Overriding the #095a8c from your example if primary is preferred */
+    border: none !important;
+    border-radius: 10px !important;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, background-color 0.3s ease !important;
+    margin: 20px auto 0;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+.vote-btn:hover {
+    transform: scale(1.05) !important;
+    background-color: #0a58ca !important; /* A darker shade of primary for hover */
+    color: var(--text-color) !important; /* Ensuring text color remains white */
+    box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Alert for no positions/candidates - using .notify-voting */
+.notify-voting {
+    background-color: var(--vote-container-bg) !important; /* Match position container bg */
+    color: var(--vote-text-medium) !important;
+    border: 1px solid var(--vote-border-color) !important;
+    font-size: 1.1rem;
+}
+
+
+
+
+/* Live Results */
+.container_live {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    background-color: white; /* Or var(--vote-page-bg) */
+}
+
+.container_live #results-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--vote-text-dark);
+    border: 2px solid var(--primary-color);
+    border-radius: 15px;
+    padding: 20px; /* Increased padding */
+    margin: 5%; /* Removed 10% for wider content on smaller screens */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+
+/* About */
+.container-about {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    background-color: var(--vote-page-bg);
+}
+
+.container-about .row.about-content-row { /* Added a more specific class */
+    padding: 20px;
+    margin: 2.5% auto; /* Center the row */
+    max-width: 960px; /* Max width for content */
+    justify-content: center;
+    align-items: flex-start; /* Align items to top */
+    border: 2px solid var(--primary-color);
+    border-radius: 15px;
+    background-color: var(--vote-container-bg); /* Light bg for about content */
+}
+
+.card-about {
+    align-items: center;
+    justify-content: center;
+    width: 100%; /* Take full width of its column */
+    margin: 0 auto;
+    background-color: transparent; /* Assuming content is directly in .row */
+    border: none; /* Remove card border if content is direct */
+}
+
+.card-bodys { /* Assuming this is for text content within .card-about or .row */
+    color: var(--vote-text-dark);
+    margin-bottom: 20px;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+.card-bodys ul li {
+  font-style: normal; /* Changed from oblique for better readability */
+  margin-bottom: 0.5rem;
+}
+
+
+/* Landing Page */
+.container_landing {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    min-height: 100vh; /* Use min-height */
+    width: 100%;
+    background: linear-gradient(to top, var(--background-gradient-start), var(--primary-color)); /* Ensure primary color is used */
+}
+
+/* Footer */
+.container_f {
+    width: 100%;
+    background-color: var(--primary-color); /* Use primary color for footer bg */
+    color: var(--text-color); /* White text for footer */
+    padding-top: 20px; /* Add padding directly */
+    padding-bottom: 20px;
+}
+
+.container_f .row { /* Assuming Bootstrap row */
+    margin: 0 auto;
+    text-align: center;
+}
+
+.small-link {
+    color: var(--secondary-color); /* Use secondary for links in footer */
+    text-decoration: none;
+    font-size: var(--responsive-font-size);
+}
+
+.small-link:hover {
+    text-decoration: underline;
+    color: var(--link-hover-color);
+}
+
+.container_landing .row.landing-content-row { /* Specific class */
+    position: relative;
+    /* height: 80vh; */ /* Avoid fixed vh if content varies */
+    text-align: center;
+    width: 100%;
+    max-width: 800px; /* Constrain landing content width */
+}
+
+.box-1 { /* Assuming this is for text content */
+    width: 100%; /* Make it responsive */
+    padding: 20px;
+    margin-top: 30px;
+}
+
+.box-2 { /* Assuming this is for the button container */
+    width: 100%;
+    /* position: absolute; bottom: 0; */ /* Avoid absolute if possible for flow */
+    margin-top: 20px; /* Space before button */
+}
+
+.box-1 a { /* Text link style */
+    font-size: var(--responsive-font-size);
+    font-weight: bold;
+    line-height: 1.5;
+    color: var(--secondary-color);
+    transition: color 0.3s ease, transform 0.3s ease; /* Added transition */
+    display: inline-block; /* For transform to work */
+}
+
+.box-1:hover a {
+    transform: scale(1.05);
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+/* Footer Styles */
+footer h5 { /* Assuming this is inside .container_f */
+    font-size: var(--responsive-font-size);
+    color: var(--text-color); /* Ensure it uses text-color from root */
+    margin-bottom: 1rem;
+}
+
+footer img { /* If you have images in footer */
+    /* color: var(--secondary-color); */ /* SVGs might use fill, not color */
+    max-width: 100px; /* Example */
+    height: auto;
+}
+
+footer { /* Global footer tag */
+    margin: 0;
+    padding: 0; /* Reset default footer margins/paddings if any */
+}

@@ -1,0 +1,265 @@
+/* landing-style.css */
+:root {
+    --primary-teal: #1EA79E; /* Teal color from the image's header and primary button */
+    --dark-overlay-bg: rgba(20, 30, 40, 0.65); /* Dark semi-transparent overlay for hero */
+    --hero-text-color: #ffffff;
+    --service-card-bg: #ffffff;
+    --service-icon-color: var(--primary-teal);
+    --service-text-color: #333333;
+    --light-bg: #f8f9fa; /* General light background for sections if needed */
+    --primary-font: 'Roboto', 'Segoe UI', sans-serif; /* Match your main font */
+}
+
+body {
+    
+    font-family: var(--primary-font);
+    margin: 0;
+    padding: 0;
+    background-color: var(--light-bg); /* Light background for the whole page */
+    line-height: 1.6;
+}
+
+/* Notification Banner (Adapt from previous CSS if you have one) */
+.landing-notification-banner {
+    background-color: var(--primary-teal); /* Or a contrasting color */
+    color: var(--hero-text-color);
+    text-align: center;
+    padding: 10px 15px;
+    font-size: 1.6rem;
+    font-weight: 500;
+  
+    top: 0; /* Assuming your main nav is not sticky or this is above it */
+    z-index: 1050; /* High z-index */
+}
+.landing-notification-banner strong {
+    font-weight: 700;
+    /* color: yellow; */ /* As per your inline style, or use a variable */
+}
+.landing-countdown-timer {
+    font-weight: bold;
+    margin-left: 8px;
+    color: yellow; /* As per your inline style */
+}
+
+
+/* Hero Section */
+.hero-section {
+    position: relative;
+    height: 75vh; /* Adjust height as needed, e.g., 60vh, 80vh */
+    min-height: 450px; /* Minimum height */
+    width: 100%;
+    overflow: hidden; /* Important for slider */
+    display: flex; /* To center hero-content */
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.hero-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center center;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    z-index: 1;
+}
+
+.hero-slide.active {
+    opacity: 1;
+    z-index: 2;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--dark-overlay-bg);
+    z-index: 3; /* Above slides, below content */
+}
+
+.hero-content {
+    position: relative; /* To sit above the overlay */
+    z-index: 4;
+    color: var(--hero-text-color);
+    padding: 20px;
+    max-width: 800px; /* Max width for content */
+}
+
+.hero-sub-headline {
+    font-size: clamp(2rem, 3.5vw, 2.25rem); /* Responsive font size */
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+}
+
+.hero-main-headline {
+    font-size: clamp(2rem, 7vw, 4.5rem); /* Responsive */
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.hero-cta-buttons .btn {
+    padding: 0.75rem 1.8rem;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    font-weight: 600;
+    border-radius: 50px; /* Pill shape buttons */
+    margin: 0.5rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.hero-btn-primary {
+    background-color: var(--primary-teal);
+    color: var(--hero-text-color);
+    border-color: var(--primary-teal);
+}
+.hero-btn-primary:hover {
+    background-color: #19948B; /* Slightly darker teal */
+    color: var(--hero-text-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.hero-btn-secondary {
+    background-color: transparent;
+    color: var(--hero-text-color);
+    border-color: var(--primary-teal); /* Use hero-text-color if teal border is too much */
+}
+.hero-btn-secondary:hover {
+    background-color: var(--primary-teal);
+    color: var(--hero-text-color);
+    border-color: var(--primary-teal);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Slider Navigation Arrows */
+.slider-nav {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: auto;
+    padding: 12px 16px;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    transition: 0.3s ease;
+    user-select: none;
+    background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent background */
+    border: none;
+    z-index: 5; /* Above hero content */
+    border-radius: 50%; /* Circular */
+    height: 44px;
+    width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.slider-nav.prev { left: 20px; }
+.slider-nav.next { right: 20px; }
+.slider-nav:hover { background-color: rgba(0, 0, 0, 0.8); }
+
+
+/* Services Section */
+.services-section {
+    background-color: var(--service-card-bg); /* White background for this section */
+    padding-top: 60px;
+    padding-bottom: 60px;
+}
+
+.service-card {
+    background-color: var(--service-card-bg); /* White cards */
+    padding: 30px 25px;
+    border-radius: 12px; /* More rounded than default Bootstrap card */
+    text-align: center;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); /* Softer, modern shadow */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%; /* For equal height cards if using Bootstrap row */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.service-icon {
+    font-size: 4.8rem; /* Size of the icon */
+    color: var(--service-icon-color); /* Teal icon */
+    margin-bottom: 20px;
+    line-height: 1; /* Ensure icon itself doesn't add too much space */
+    width: 70px; /* Circle background for icon */
+    height: 70px;
+    background-color: #e0f7f6; /* Very light teal background for icon circle */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.service-title {
+    font-size: 3.25rem;
+    font-weight: 600;
+    color: var(--service-text-color);
+    margin-bottom: 10px;
+}
+
+.service-description {
+    font-size: 1.95rem;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-main-headline {
+        font-size: clamp(1.8rem, 5vw, 2.5rem);
+    }
+    .hero-cta-buttons .btn {
+        padding: 0.6rem 1.5rem;
+        font-size: clamp(0.85rem, 1.8vw, 1rem);
+        display: block; /* Stack buttons on mobile */
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .slider-nav { /* Smaller nav arrows on mobile */
+        padding: 8px 12px;
+        font-size: 16px;
+        height: 36px;
+        width: 36px;
+    }
+    .slider-nav.prev { left: 10px; }
+    .slider-nav.next { right: 10px; }
+
+    .service-card {
+        padding: 25px 20px;
+    }
+    .service-icon {
+        font-size: 2.2rem;
+        width: 60px;
+        height: 60px;
+        margin-bottom: 15px;
+    }
+    .service-title {
+        font-size: 1.1rem;
+    }
+}

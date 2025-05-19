@@ -1,0 +1,123 @@
+
+
+#wrapper {
+    background-color: white;
+    
+}
+.row {
+	width:90%;
+	max-width: 600px; /* Limit the container width */
+}
+/*Styling the form*/
+.index-form {
+    border-style: solid;
+    border-width: thin;
+    border-radius: 5px;
+}
+
+.form-heading {
+    font-weight: bold;
+    background-color: #449d44;
+    font-size: 20px;
+    color: white;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.panel {
+    border: none;
+}
+
+.login-panel {
+    background-color: white;
+	border-radius: 10px;
+	padding: 40px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	margin:20px auto;
+}
+
+input {
+    background-color: gray;
+    font-size: 18px;
+    padding-left: 5px;
+    border-width: thin;
+    border-top-style: hidden;
+    border-left-style: hidden;
+    border-right-style: hidden;
+    border-bottom-style: solid;
+
+}
+
+.form-field {
+    padding-top: 20px;
+    text-align: center;
+}
+
+label {
+    font-style: italic;
+    font-size: large;
+    font-weight: bold;
+	color:green;
+}
+
+button {
+    font-size: larger;
+    background-color:green ;
+    cursor: pointer;
+    height: 30px;
+    width: 50%;
+    padding: 5px;
+    color: white;
+    border-style: solid;
+    border-color: darkgreen;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+button:hover {
+    background-color: darkgreen;
+    color: white;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+a:visited {
+    color: black;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+.panel-nav {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.panel-nav a:hover {
+    border-bottom: solid;
+    border-top: solid;
+}
+
+.panel-nav {
+    font-size: 16px;
+}
+
+/*Dropdown menue*/
+nav {
+    margin-top: -10px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 20px;
+}
+
+select {
+    color: green;
+}
+
+.login-panel {
+    margin-top: 10px;
+}
