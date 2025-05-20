@@ -30,7 +30,7 @@ try {
 ?>
 
 <body>
-<div id="wrapper">
+<div id="wrapper " >
     <?php include('side_bar.php'); ?>
 
     <div id="page-wrapper">

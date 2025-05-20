@@ -1,7 +1,7 @@
-<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom:0; background-color:green;">
+<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom:0; background-color: #2e6da4">
     <div class="navbar-header">
         <a class="navbar-brand" href="" style="color:white; padding-left:25px;">
-            <i class="fa fa-home fa-large"></i> HOME | OVS - Online Voting System
+            <i class="fa fa-home fa-large"></i> HOME | AMU- Online Voting System
         </a>
     </div>
 
@@ -11,7 +11,7 @@
 
         try {
             // Use a parameterized query to fetch voter details securely
-            $query = $pdo->prepare("SELECT * FROM voters WHERE voters_id = ?");
+            $query = $pdo->prepare("SELECT * FROM users WHERE user_id = ?");
             $query->execute([$session_id]);
 
             while ($row = $query->fetch(PDO::FETCH_ASSOC)) {

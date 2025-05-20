@@ -46,7 +46,7 @@ try {
 ?>
 
 <body>
-    <div id="wrapper">
+    <div id="wrapper" >
 
         <!-- Navigation -->
         <?php include('side_bar.php'); ?>
@@ -147,179 +147,108 @@ try {
                     </div>
                 </div>
 
-                <!-- Charts -->
-                <div class="row">
-                    <!-- Gender Chart -->
-                    <div class="col-md-6">
-                        <div class="panel panel-info">
-                            <div class="panel-heading"><i class="fa fa-venus-mars"></i> Gender Distribution</div>
-                            <div class="panel-body">
-                                <div id="genderChart" style="width:100%; height:300px;"></div>
-                            </div>
-                        </div>
-                    </div>
+  
 
-                    <!-- Voting Status Chart -->
-                    <div class="col-md-6">
-                        <div class="panel panel-success">
-                            <div class="panel-heading"><i class="fa fa-check-square"></i> Voting Status</div>
-                            <div class="panel-body">
-                                <div id="votingStatusChart" style="width:100%; height:300px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <!-- Account Status Chart -->
-                    <div class="col-md-6">
-                        <div class="panel panel-warning">
-                            <div class="panel-heading"><i class="fa fa-user-circle"></i> Account Status</div>
-                            <div class="panel-body">
-                                <div id="accountStatusChart" style="width:100%; height:300px;"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Registration Dates Chart -->
-                    <div class="col-md-6">
-                        <div class="panel panel-primary">
-                            <div class="panel-heading"><i class="fa fa-calendar"></i> Registrations Over Time by Gender</div>
-                            <div class="panel-body">
-                                <div id="registrationDateChart" style="width:100%; height:300px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Delete All Voters Modal -->
-    <div class="modal fade" id="deleteAllVotersModal" tabindex="-1" role="dialog" aria-labelledby="deleteAllVotersModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteAllVotersModalLabel">Confirm Delete All Voters</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Before deleting voters data kindly make sure you have printed the voting report first. Are you sure you want to delete all voters? This action cannot be undone.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteAllVoters">Delete All Voters</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <?php include('script.php'); ?>
-
-    <!-- Google Charts -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script>
-    google.charts.load('current', {
-        packages: ['corechart', 'bar']
-    });
-    google.charts.setOnLoadCallback(drawCharts);
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif;  }
+        .chart-container { margin-bottom: 40px; }
+        button { margin: 10px 5px; padding: 10px; }
+    </style>
+</head>
+<body>
 
-    function drawCharts() {
-        // Gender Chart
-        var genderData = google.visualization.arrayToDataTable([
-            ['Gender', 'Count'],
-            ['Male', <?php echo $count3['total']; ?>],
-            ['Female', <?php echo $count4['total']; ?>]
-        ]);
-        var genderOptions = {
-            title: 'Gender Distribution',
-            pieHole: 0.4,
-            colors: ['#3366CC', '#FF6699']
-        };
-        var genderChart = new google.visualization.PieChart(document.getElementById('genderChart'));
-        genderChart.draw(genderData, genderOptions);
+<?php
+// Simulated values (replace with your real DB query results)
+$count1 = ['total' => 150]; // Voted
+$count2 = ['total' => 50];  // Unvoted
+$count3 = ['total' => 120]; // Male
+$count4 = ['total' => 80];  // Female
+$count5 = ['total' => 160]; // Active
+$count6 = ['total' => 40];  // Inactive
 
-        // Voting Status Chart
-        var votingStatusData = google.visualization.arrayToDataTable([
-            ['Status', 'Count'],
-            ['Voted', <?php echo $count1['total']; ?>],
-            ['Unvoted', <?php echo $count2['total']; ?>]
-        ]);
-        var votingStatusOptions = {
-            title: 'Voting Status',
-            pieHole: 0.4,
-            colors: ['#28a745', '#dc3545']
-        };
-        var votingStatusChart = new google.visualization.PieChart(document.getElementById('votingStatusChart'));
-        votingStatusChart.draw(votingStatusData, votingStatusOptions);
+// Example monthly data
+$months = ['Jan', 'Feb', 'Mar', 'Apr', 'May'];
+$countsByMonthGender = [
+    'Jan' => ['Male' => 10, 'Female' => 5],
+    'Feb' => ['Male' => 20, 'Female' => 15],
+    'Mar' => ['Male' => 30, 'Female' => 20],
+    'Apr' => ['Male' => 25, 'Female' => 25],
+    'May' => ['Male' => 35, 'Female' => 15]
+];
+?>
 
-        // Account Status Chart
-        var accountStatusData = google.visualization.arrayToDataTable([
-            ['Account Status', 'Count'],
-            ['Active', <?php echo $count5['total']; ?>],
-            ['Inactive', <?php echo $count6['total']; ?>]
-        ]);
-        var accountStatusOptions = {
-            title: 'Account Status',
-            pieHole: 0.4,
-            colors: ['#ffc107', '#6c757d']
-        };
-        var accountStatusChart = new google.visualization.PieChart(document.getElementById('accountStatusChart'));
-        accountStatusChart.draw(accountStatusData, accountStatusOptions);
+<div class="chart-container" id="genderChart" style="width:100%; height:300px;"></div>
+<div class="chart-container" id="votingStatusChart" style="width:100%; height:300px;"></div>
+<div class="chart-container" id="accountStatusChart" style="width:100%; height:300px;"></div>
+<div class="chart-container" id="registrationDateChart" style="width:100%; height:300px;"></div>
 
-        // Registration Dates Multi-line Chart (Male vs Female)
-        var regDataArray = [
-            ['Month', 'Male', 'Female']
-        ];
+<button onclick="exportChartAsImage('genderChart')">Export Gender Chart</button>
+<button onclick="exportChartAsImage('votingStatusChart')">Export Voting Chart</button>
+<button onclick="exportChartAsImage('accountStatusChart')">Export Account Chart</button>
+<button onclick="exportChartAsImage('registrationDateChart')">Export Registration Chart</button>
 
-        <?php
-        foreach ($months as $month) {
-            $maleCount = isset($countsByMonthGender[$month]['Male']) ? $countsByMonthGender[$month]['Male'] : 0;
-            $femaleCount = isset($countsByMonthGender[$month]['Female']) ? $countsByMonthGender[$month]['Female'] : 0;
-            echo "regDataArray.push(['" . htmlspecialchars($month) . "', $maleCount, $femaleCount]);\n";
-        }
-        ?>
+<script>
+google.charts.load('current', { packages: ['corechart'] });
+google.charts.setOnLoadCallback(drawCharts);
 
-        var regData = google.visualization.arrayToDataTable(regDataArray);
-        var regOptions = {
-            title: 'Registrations Over Time by Gender',
-            hAxis: {
-                title: 'Month',
-                slantedText: true,
-                slantedTextAngle: 45
-            },
-            vAxis: {
-                title: 'Number of Registrations'
-            },
-            legend: { position: 'bottom' },
-            colors: ['#3366CC', '#FF6699'],
-            curveType: 'function',
-            pointSize: 5
-        };
-        var regChart = new google.visualization.LineChart(document.getElementById('registrationDateChart'));
-        regChart.draw(regData, regOptions);
+function drawCharts() {
+    var genderData = google.visualization.arrayToDataTable([
+        ['Gender', 'Count'],
+        ['Male', <?php echo (int)$count3['total']; ?>],
+        ['Female', <?php echo (int)$count4['total']; ?>]
+    ]);
+    var genderOptions = { title: 'Gender Distribution', pieHole: 0.4, colors: ['#3366CC', '#FF6699'] };
+    new google.visualization.PieChart(document.getElementById('genderChart')).draw(genderData, genderOptions);
+
+    var votingData = google.visualization.arrayToDataTable([
+        ['Status', 'Count'],
+        ['Voted', <?php echo (int)$count1['total']; ?>],
+        ['Unvoted', <?php echo (int)$count2['total']; ?>]
+    ]);
+    var votingOptions = { title: 'Voting Status', pieHole: 0.4, colors: ['#28a745', '#dc3545'] };
+    new google.visualization.PieChart(document.getElementById('votingStatusChart')).draw(votingData, votingOptions);
+
+    var accountData = google.visualization.arrayToDataTable([
+        ['Account', 'Count'],
+        ['Active', <?php echo (int)$count5['total']; ?>],
+        ['Inactive', <?php echo (int)$count6['total']; ?>]
+    ]);
+    var accountOptions = { title: 'Account Status', pieHole: 0.4, colors: ['#ffc107', '#6c757d'] };
+    new google.visualization.PieChart(document.getElementById('accountStatusChart')).draw(accountData, accountOptions);
+
+    var regDataArray = [['Month', 'Male', 'Female']];
+    <?php
+    foreach ($months as $month) {
+        $m = isset($countsByMonthGender[$month]['Male']) ? $countsByMonthGender[$month]['Male'] : 0;
+        $f = isset($countsByMonthGender[$month]['Female']) ? $countsByMonthGender[$month]['Female'] : 0;
+        echo "regDataArray.push(['$month', $m, $f]);\n";
     }
-
-    window.addEventListener('resize', drawCharts);
-
-    // Delete all voters AJAX
-    $(document).ready(function() {
-        $('#confirmDeleteAllVoters').click(function() {
-            $.ajax({
-                type: 'POST',
-                url: 'delete_all_voters.php',
-                success: function(response) {
-                    alert(response);
-                    $('#deleteAllVotersModal').modal('hide');
-location.reload();
-},
-error: function() {
-alert('Error deleting voters.');
+    ?>
+    var regData = google.visualization.arrayToDataTable(regDataArray);
+    var regOptions = {
+        title: 'Registrations Over Time by Gender',
+        curveType: 'function',
+        legend: { position: 'bottom' },
+        hAxis: { title: 'Month', slantedText: true, slantedTextAngle: 45 },
+        vAxis: { title: 'Registrations' },
+        pointSize: 5
+    };
+    new google.visualization.LineChart(document.getElementById('registrationDateChart')).draw(regData, regOptions);
 }
-});
-});
-</body> </html> ```
+
+window.addEventListener('resize', drawCharts);
+
+function exportChartAsImage(chartId) {
+    html2canvas(document.getElementById(chartId)).then(canvas => {
+        var link = document.createElement('a');
+        link.download = chartId + '.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+}
+</script>
+
+</body>
+</html>
