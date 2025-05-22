@@ -63,10 +63,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Get the ID of the newly inserted voting event
             $votingEventId = $pdo->lastInsertId();
 
-            // Activate all voters
-            $updateStmt = $pdo->prepare("UPDATE voters SET account = 'Active'");
-            $updateStmt->execute();
-
             // Return a success message
             echo "Voting initiated successfully! Title: " . htmlspecialchars($title) . ", Duration: " . $hours . " hours.";
         }

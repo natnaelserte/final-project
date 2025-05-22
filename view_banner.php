@@ -19,7 +19,7 @@ try {
 }
 ?>
 
-<nav class="navbar navbar-default custom-navbar" style="background-color: #0d1b2a; border: none; margin-bottom: 0;">
+<nav class="navbar1 custom-navbar">
   <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbarNav">
@@ -48,11 +48,7 @@ try {
                     <?php endif; ?>
                 </a>
           
-            </div>
-     
-
-
- 
+             </div>
       </ul>
     </div>
   </div>
@@ -78,88 +74,3 @@ try {
     }
   }
 </script>
-<style>
-body {
-            margin: 0;
-            padding: 0;
-        }
-        .announcement-link {
-            position: fixed;
-            top: 15px;
-            right: 20px;
-            z-index: 1000;
-            font-size: 20px;
-        }
-        .announcement-link a {
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-        }
-        .announcement-link .badge {
-            background-color: red;
-            color: white;
-            padding: 2px 6px;
-            font-size: 25px;
-            border-radius: 10px;
-            vertical-align: middle;
-            margin-left: 4px;
-        }
-   
-
-  .custom-navbar {
-    height: 130px;
-    display: flex;
-    align-items: center;
-  }
-
-  .nav-links {
-    margin: 0 auto;
-    display: table;
-    float: none;
-  }
-
-  .nav-links li a {
-    color: white !important;
-    font-size: 22px;
-    color: white;
-    
-    font-weight: 500;
-    padding: 12px 18px;
-    position: relative;
-    transition: all 0.4s ease;
-  }
-
-  .nav-links li a::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: 8px;
-    transform: translateX(-50%);
-    width: 0%;
-    height: 2px;
-    background: #00bcd4;
-    transition: width 0.4s ease;
-  }
-
-  .nav-links li a:hover {
-    color: #00bcd4 !important;
-  }
-
-  .nav-links li a:hover::after {
-    width: 80%;
-  }
-
-  .navbar-brand {
-    padding: 20px 15px;
-  }
-
-  /* Optional: active page underline */
-  .nav-links li a.active {
-    color: #00bcd4 !important;
-    font-weight: bold;
-  }
-
-  .nav-links li a.active::after {
-    width: 80%;
-  }
-</style>

@@ -9,7 +9,26 @@
         <div class="row">
             <div class="col-lg-12">
                 <h3 class="page-header">Voter List</h3>
+                    <?php try {
+                        $query = $pdo->prepare("SELECT * FROM voting_events WHERE is_active = 1");
+                        $query->execute();
+                        $votingEvent = $query->fetch(PDO::FETCH_ASSOC);
 
+                        if ($votingEvent) {
+                            // Show edit button
+                            echo '<button type="button" class="btn btn-warning pull-right" data-toggle="modal" data-target="#votingModal" style="margin-right:12px;">
+                                    <i class="fa fa-pencil-square-o"></i> Edit Voting
+                                  </button>';
+                        } else {
+                            // Show initiate button
+                            echo '<button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#votingModal" style="margin-right:12px;">
+                                    <i class="fa fa-check-square-o"></i> Initiate Voting
+                                  </button>';
+                        }
+                    } catch (PDOException $e) {
+                        echo "<div class='alert alert-danger'>Error: " . htmlspecialchars($e->getMessage()) . "</div>";
+                    }
+                    ?>
                 <!-- Export to Excel Button -->
                 <div class="row mb-4">
                     <div class="col-md-12">
@@ -17,10 +36,10 @@
                             <i class="fa fa-file-excel-o"></i> Export Voters to Excel
                         </a>
                     </div>
-                </div>
+                
 
-                <!-- Stylish Activation/Deactivation Buttons -->
-                <div class="row mb-4">
+                  <!-- Stylish Activation/Deactivation Buttons -->
+                 
                     <div class="col-md-6">
                         <a href="activate_accounts.php" class="btn btn-lg btn-block" style="background-color:#28a745; color:white; font-weight:bold;">
                             <i class="fa fa-check-circle"></i> Activate Voter Accounts

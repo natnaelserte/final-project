@@ -2,231 +2,457 @@
 :root {
     --primary-color: rgba(30, 110, 157, 0.9);
     --secondary-color: #9add53; /* Greenish, might be good for "selected" or positive actions */
-    --text-color: white; /* Primarily for dark backgrounds as per your nav */
+    --text-color: white; /* Primarily for dark backgrounds */
     --link-hover-color: #48CAE4;
     --active-link-underline-color: rgb(14, 171, 233);
     --background-gradient-start: rgba(26, 29, 38, 0.5);
-    --responsive-font-size: clamp(1rem, 2.5vw, 1.5rem); /* Adjusted for content readability */
+    --responsive-font-size: clamp(1rem, 2.5vw, 1.5rem);
 
-    /* Additional colors for the voting page for a two-color scheme (primary + white/grays) */
+    /* Additional colors for the voting page */
     --vote-page-bg: #ffffff;
-    --vote-container-bg: #f8f9fa; /* Very light gray for position containers */
+    --vote-container-bg: #f8f9fa;
     --vote-text-dark: #212529;
     --vote-text-medium: #495057;
     --vote-text-light: #6c757d;
     --vote-border-color: #dee2e6;
+
+    /* Navbar specific variables */
+    --navbar-custom-bg: #0d1b2a;
+    --navbar-custom-link-color: var(--text-color);
+    --navbar-custom-link-hover-active-color: #00bcd4;
+    --navbar-custom-badge-bg: red;
+    --navbar-custom-badge-text-color: var(--text-color);
+    --navbar-custom-announcement-icon-text-color: var(--text-color);
+
+    /* Custom Button Variables (New) */
+    --btn-border-radius: 6px;
+    --btn-padding-y: 0.55rem; /* Adjusted slightly */
+    --btn-padding-x: 1.1rem;  /* Adjusted slightly */
+    --btn-font-size: 0.9rem;
+    --btn-font-weight: 500;
+    --btn-icon-margin-right: 8px;
+    --btn-shadow: 0 2px 4px rgba(0, 0, 0, 0.075);
+    --btn-hover-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    --btn-active-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+    /* Specific button colors from PHP / Image */
+    --btn-color-primary: var(--primary-color); /* For 'Initiate Voting', 'Confirm' */
+    --btn-color-success: #28a745;        /* Activate Voter Accounts */
+    --btn-color-danger: #dc3545;         /* Deactivate Voter Accounts */
+    --btn-color-info: #17a2b8;           /* Export Voters */
+    --btn-color-warning: #ffc107;        /* For 'Edit Voting' outline */
+    --btn-color-secondary-outline-text: var(--vote-text-medium); /* For 'Cancel' button text/border */
+    --btn-color-secondary-outline-bg-hover: var(--vote-text-medium);
 }
 
 body {
-    font-family: 'Roboto', sans-serif; /* Added from previous iteration */
+    font-family: 'Roboto', sans-serif;
     font-size: 1rem;
-    color: var(--vote-text-medium); /* Default text color for light backgrounds */
-    background-color: var(--vote-page-bg); /* White background for voting page content area */
+    color: var(--vote-text-medium);
+    background-color: var(--vote-page-bg);
     margin: 0;
     padding: 0;
+    
 }
 
-/* Header - Your existing .navheader styles */
-.navheader {
+/* --- Custom Navbar Styles  --- */
+.navbar1,.custom-navbar {
+    background-color: var(--navbar-custom-bg);
+    border: none;
+    margin-bottom: 0;
+    height: 60px;
+    display: flex;
+    align-items: center;
     position: sticky;
     top: 0;
-    z-index: 1000; /* Ensures it's above other content */
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    width: 100%;
+    border-radius: 0;
+}
+
+.custom-navbar .container-fluid {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: center;
     width: 100%;
-    background: var(--primary-color); /* Define this in your :root */
-    padding: 15px 20px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
-
-.navheader .navbar-brand {
-    color: var(--text-color);
+.custom-navbar .navbar-brand {
+    color: var(--navbar-custom-link-color);
     font-weight: bold;
-    font-size: 2rem;
+    font-size: 1.8rem;
     text-decoration: none;
-    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: normal;
+    margin-right: 20px;
+    border-radius: 0;
+}
+.custom-navbar .navbar-brand:hover,
+.custom-navbar .navbar-brand:focus {
+    color: var(--navbar-custom-link-color);
+    text-decoration: none;
 }
 
-.navbar-toggler {
-    border: none !important;
-    background: transparent !important;
-    padding: 0 !important;
-}
-
-.navbar-toggler:focus {
-    outline: none !important;
-}
-
-.navbar-toggler-icon {
-    display: inline-block;
-    width: 1.5em;
-    height: 1.5em;
-    vertical-align: middle;
-    content: "";
-    background: none;
-    cursor: pointer;
-}
-
-.navbar-toggler-icon::before {
-    content: '\2630';
-    color: var(--text-color); /* Changed to var(--text-color) for consistency */
-    font-size: 2rem;
-    line-height: 1;
-    transition: color 0.3s ease-in-out;
-    display: block;
-    margin: auto;
-}
-
-.navheader .collapse {
-    text-align: center;
-    width: 100%;
-    margin: 10px 0;
-}
-
-.navheader .navbar-nav {
+.custom-navbar .navbar-header {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    width: 100%;
-    padding: 0;
+}
+
+.custom-navbar .navbar-toggle {
+    border: 1px solid transparent;
+    background-color: transparent;
+    padding: 9px 10px;
     margin: 0;
+    border-radius: 0;
 }
-
-.navheader .nav-item {
-    list-style: none;
-    padding: 10px 20px;
-    position: relative;
-    border-radius: 10px;
-    transition: transform 0.3s ease, border-color 0.3s ease;
-    overflow: hidden;
-    width: auto;
-    margin: 5px 0;
+.custom-navbar .navbar-toggle:hover,
+.custom-navbar .navbar-toggle:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--navbar-custom-link-hover-active-color);
 }
-
-.navheader .nav-item::before,
-.navheader .nav-item::after {
-    content: "";
-    position: absolute;
-    width: 0;
-    height: 2px;
-    background: var(--text-color);
-    transition: width 0.3s ease;
-}
-
-.navheader .nav-item::before {
-    top: 0;
-    left: 0;
-}
-
-.navheader .nav-item::after {
-    bottom: 0;
-    right: 0;
-}
-
-.navheader .nav-item span {
-    content: "";
-    position: absolute;
-    width: 2px;
-    height: 0;
-    background: var(--text-color);
-    transition: height 0.3s ease;
-}
-
-.navheader .nav-item span:first-child {
-    left: 0;
-    top: 0;
-}
-
-.navheader .nav-item span:last-child {
-    right: 0;
-    bottom: 0;
-}
-
-.navheader .nav-item:hover::before,
-.navheader .nav-item:hover::after {
-    width: 100%;
-}
-
-.navheader .nav-item:hover span:first-child,
-.navheader .nav-item:hover span:last-child {
-    height: 100%;
-}
-
-.navheader .nav-item:hover {
-    transform: scale(1.1);
-}
-
-.navheader .nav-item .nav-link {
-    color: var(--text-color);
-    text-decoration: none;
-    font-size: 2.5rem;
-    transition: color 0.3s ease-in-out;
+.custom-navbar .navbar-toggle .icon-bar {
+    background-color: var(--navbar-custom-link-color);
     display: block;
-    padding: 5px 10px;
+    width: 22px;
+    height: 2px;
+    border-radius: 0;
+}
+.custom-navbar .navbar-toggle .icon-bar + .icon-bar {
+    margin-top: 4px;
 }
 
-.navheader .nav-link:hover {
-    color: var(--secondary-color);
+.custom-navbar .navbar-collapse {
+    border-top: 0;
+    box-shadow: none;
+    padding-left: 0;
+    padding-right: 0;
+    /* flex-grow: 1; */
+    display: flex;
+    justify-content: center;
 }
 
-.navheader .nav-link.active {
+.custom-navbar .nav-links {
+    width: 860px;
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+}
+
+.custom-navbar .nav-links > li > a {
+    color: var(--navbar-custom-link-color) !important;
+    font-size: 20px;
+    font-weight: 500;
+    padding: 15px 18px;
     text-decoration: none;
     position: relative;
-    pointer-events: none;
+    transition: color 0.4s ease;
+    display: block;
+    border-radius: 0;
+    line-height: normal;
 }
 
-.navheader .nav-link.active::after {
-    content: "";
+.custom-navbar .nav-links > li > a::after {
+    content: '';
     position: absolute;
-    left: 0;
-    bottom: -2px;
-    width: 100%;
+    left: 50%;
+    bottom: 10px;
+    transform: translateX(-50%);
+    width: 0%;
     height: 2px;
-    background-color: var(--active-link-underline-color);
+    background: var(--navbar-custom-link-hover-active-color);
+    transition: width 0.4s ease;
 }
 
-@media (min-width: 992px) {
-    .navheader {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 20px;
+.custom-navbar .nav-links > li > a:hover,
+.custom-navbar .nav-links > li > a:focus {
+    color: var(--navbar-custom-link-hover-active-color) !important;
+    background-color: transparent;
+}
+
+.custom-navbar .nav-links > li > a:hover::after {
+    width: 80%;
+}
+
+.custom-navbar .nav-links > li > a.active {
+    color: var(--navbar-custom-link-hover-active-color) !important;
+    font-weight: bold;
+    background-color: transparent;
+}
+
+.custom-navbar .nav-links > li > a.active::after {
+    width: 80%;
+}
+
+.announcement-link {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+    font-size: 20px;
+}
+.announcement-link a {
+    text-decoration: none;
+    color: var(--navbar-custom-announcement-icon-text-color);
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+.announcement-link a:hover {
+    color: var(--navbar-custom-link-hover-active-color);
+}
+
+.announcement-link .badge {
+    background-color: var(--navbar-custom-badge-bg);
+    color: var(--navbar-custom-badge-text-color);
+    padding: 3px 7px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    vertical-align: middle;
+    margin-left: 5px;
+    border-radius: 0;
+    line-height: 1;
+}
+
+@media (max-width: 767px) {
+    .custom-navbar .navbar-collapse {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        background-color: var(--navbar-custom-bg);
+        z-index: 1029;
+        padding: 0;
+        max-height: calc(100vh - 60px);
+        overflow-y: auto;
+        justify-content: flex-start;
     }
-    .navbar-toggler { display: none; }
-    .navheader .collapse { text-align: right; width: auto; }
-    .navheader .navbar-nav { flex-direction: row; }
-    .navheader .nav-item { margin: 0; }
-    .navheader .nav-link { font-size: 1.2rem; }
+    .custom-navbar .navbar-collapse.in {
+        display: block !important;
+    }
+    .custom-navbar .nav-links {
+        flex-direction: column;
+        width: 100%;
+    }
+    .custom-navbar .nav-links > li {
+        width: 100%;
+    }
+    .custom-navbar .nav-links > li > a {
+        padding: 15px 20px;
+        text-align: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 18px;
+    }
+    .custom-navbar .nav-links > li:first-child > a {
+        border-top: none;
+    }
+    .custom-navbar .nav-links > li > a::after {
+        bottom: 5px;
+    }
+    .custom-navbar .nav-links > li > a:hover,
+    .custom-navbar .nav-links > li > a.active {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    .announcement-link {
+        margin: 10px 0;
+        padding: 0 20px;
+        justify-content: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
+    }
+    .announcement-link a {
+        padding: 10px 0;
+    }
+}
+
+/* --- Custom Buttons (Inspired by Image) --- */
+.btn-custom {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--btn-padding-y) var(--btn-padding-x);
+    font-size: var(--btn-font-size);
+    font-weight: var(--btn-font-weight);
+    border-radius: var(--btn-border-radius);
+    text-decoration: none !important;
+    transition: all 0.2s ease-in-out;
+    box-shadow: var(--btn-shadow);
+    border: 1px solid transparent;
+    cursor: pointer;
+    line-height: 1.5;
+    margin-bottom: 5px; /* Add some space if they stack */
+    margin-right: 5px; /* Add some space if inline */
+}
+
+.btn-custom:hover {
+    box-shadow: var(--btn-hover-shadow);
+    transform: translateY(-1px);
+}
+
+.btn-custom:active, .btn-custom.active {
+    box-shadow: var(--btn-active-shadow);
+    transform: translateY(0px);
+}
+
+.btn-custom:focus, .btn-custom.focus {
+    outline: 0;
+    /* Generic focus ring, using primary color as base */
+    box-shadow: var(--btn-hover-shadow), 0 0 0 0.2rem color-mix(in srgb, var(--btn-color-primary) 25%, transparent);
+}
+
+.btn-custom .fa, .btn-custom .glyphicon { /* Support for FontAwesome and Glyphicons */
+    margin-right: var(--btn-icon-margin-right);
+    line-height: 1; /* Ensure icon aligns well */
+}
+
+/* Solid Button Style */
+.btn-custom-solid {
+    color: var(--text-color); /* White text by default */
+}
+
+.btn-custom-solid.btn-primary-custom {
+    background-color: var(--btn-color-primary);
+    border-color: var(--btn-color-primary);
+}
+.btn-custom-solid.btn-primary-custom:hover {
+    background-color: color-mix(in srgb, var(--btn-color-primary) 85%, black);
+    border-color: color-mix(in srgb, var(--btn-color-primary) 85%, black);
+}
+.btn-custom-solid.btn-primary-custom:focus {
+    box-shadow: var(--btn-hover-shadow), 0 0 0 0.2rem color-mix(in srgb, var(--btn-color-primary) 35%, transparent);
+}
+
+.btn-custom-solid.btn-success-custom {
+    background-color: var(--btn-color-success);
+    border-color: var(--btn-color-success);
+}
+.btn-custom-solid.btn-success-custom:hover {
+    background-color: color-mix(in srgb, var(--btn-color-success) 85%, black);
+    border-color: color-mix(in srgb, var(--btn-color-success) 85%, black);
+}
+.btn-custom-solid.btn-success-custom:focus {
+    box-shadow: var(--btn-hover-shadow), 0 0 0 0.2rem color-mix(in srgb, var(--btn-color-success) 35%, transparent);
+}
+
+.btn-custom-solid.btn-danger-custom {
+    background-color: var(--btn-color-danger);
+    border-color: var(--btn-color-danger);
+}
+.btn-custom-solid.btn-danger-custom:hover {
+    background-color: color-mix(in srgb, var(--btn-color-danger) 85%, black);
+    border-color: color-mix(in srgb, var(--btn-color-danger) 85%, black);
+}
+.btn-custom-solid.btn-danger-custom:focus {
+    box-shadow: var(--btn-hover-shadow), 0 0 0 0.2rem color-mix(in srgb, var(--btn-color-danger) 35%, transparent);
+}
+
+.btn-custom-solid.btn-info-custom {
+    background-color: var(--btn-color-info);
+    border-color: var(--btn-color-info);
+}
+.btn-custom-solid.btn-info-custom:hover {
+    background-color: color-mix(in srgb, var(--btn-color-info) 85%, black);
+    border-color: color-mix(in srgb, var(--btn-color-info) 85%, black);
+}
+.btn-custom-solid.btn-info-custom:focus {
+    box-shadow: var(--btn-hover-shadow), 0 0 0 0.2rem color-mix(in srgb, var(--btn-color-info) 35%, transparent);
+}
+
+/* Outline Button Style */
+.btn-custom-outline {
+    background-color: white;
+}
+
+.btn-custom-outline.btn-warning-custom {
+    color: var(--btn-color-warning);
+    border-color: var(--btn-color-warning);
+}
+.btn-custom-outline.btn-warning-custom:hover {
+    background-color: var(--btn-color-warning);
+    color: black; /* Warning hover text usually dark */
+}
+.btn-custom-outline.btn-warning-custom:focus {
+    box-shadow: var(--btn-hover-shadow), 0 0 0 0.2rem color-mix(in srgb, var(--btn-color-warning) 35%, transparent);
+}
+.btn-custom-outline.btn-warning-custom .fa,
+.btn-custom-outline.btn-warning-custom .glyphicon {
+    color: var(--btn-color-warning);
+}
+.btn-custom-outline.btn-warning-custom:hover .fa,
+.btn-custom-outline.btn-warning-custom:hover .glyphicon {
+    color: black;
+}
+
+
+.btn-custom-outline.btn-secondary-custom { /* For 'Cancel' button */
+    color: var(--btn-color-secondary-outline-text);
+    border-color: var(--btn-color-secondary-outline-text);
+}
+.btn-custom-outline.btn-secondary-custom:hover {
+    background-color: var(--btn-color-secondary-outline-bg-hover);
+    color: var(--text-color); /* White text on gray hover */
+}
+.btn-custom-outline.btn-secondary-custom:focus {
+    box-shadow: var(--btn-hover-shadow), 0 0 0 0.2rem color-mix(in srgb, var(--btn-color-secondary-outline-text) 35%, transparent);
+}
+.btn-custom-outline.btn-secondary-custom .fa,
+.btn-custom-outline.btn-secondary-custom .glyphicon {
+    color: var(--btn-color-secondary-outline-text);
+}
+.btn-custom-outline.btn-secondary-custom:hover .fa,
+.btn-custom-outline.btn-secondary-custom:hover .glyphicon {
+    color: var(--text-color);
+}
+
+/* Button Sizes (complementing Bootstrap .btn-lg, .btn-sm if used) */
+.btn-custom.btn-lg {
+    padding: calc(var(--btn-padding-y) * 1.5) calc(var(--btn-padding-x) * 1.75);
+    font-size: calc(var(--btn-font-size) * 1.20); /* Adjusted for better scaling */
+    /* border-radius: calc(var(--btn-border-radius) * 1.2); */
+}
+.btn-custom.btn-sm {
+    padding: calc(var(--btn-padding-y) * 0.8) calc(var(--btn-padding-x) * 0.8);
+    font-size: calc(var(--btn-font-size) * 0.9);
+    border-radius: calc(var(--btn-border-radius) * 0.8);
+}
+
+
+.btn-custom.btn-block {
+    display: flex; /* Override inline-flex for block */
+    width: 100%;
+    margin-right: 0; /* No right margin if it's full width */
 }
 
 
 /* --- Voting Page Specific Styles --- */
+/* ... (Rest of your CSS: .container_vote_content, .main-voting-title, etc.) ... */
+/* ... (No changes to these sections unless directly related to overall optimization) ... */
 
-/* Wrapper for the main content area of the voting page, used with sidebar */
-/* #wrapper_1 is already in your CSS, applying gradient background */
-/* if sidebar is present, this #wrapper_1 might need to have display:flex with the sidebar */
-
-.container_vote_content { /* Specific container for the voting form area within #wrapper_1 */
-    padding: 20px; /* Bootstrap's .container already has padding, adjust as needed */
-    flex-grow: 1; /* If inside a flex container like #wrapper_1 with a sidebar */
+.container_vote_content {
+    padding: 20px;
+    flex-grow: 1;
     width: 100%;
-    max-width: 1200px; /* Optional: constrain max width */
+    max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
 }
 
 .main-voting-title {
-    color: var(--primary-color); /* Use primary color for the main title */
+    color: var(--primary-color);
     font-weight: 700;
-    font-size: clamp(1.8rem, 4vw, 2.5rem); /* Responsive font size */
-    margin-bottom: 2.5rem !important; /* More space below title */
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    margin-bottom: 2.5rem !important;
 }
 
-/* .position-container is already in your CSS, let's ensure it fits the theme */
 .position-container {
-    background-color: var(--vote-container-bg); /* Light gray for contrast against white page */
+    background-color: var(--vote-container-bg);
     padding: 20px;
     border-radius: 10px;
     border: 1px solid var(--vote-border-color);
@@ -234,37 +460,35 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-/* .position-title is already in your CSS */
 .position-title {
-    color: var(--primary-color); /* Use primary color */
+    color: var(--primary-color);
     border-bottom: 2px solid var(--primary-color);
     padding-bottom: 10px;
-    margin-bottom: 25px !important; /* Increased margin */
+    margin-bottom: 25px !important;
     text-align: center;
-    font-size: clamp(1.4rem, 3vw, 1.8rem); /* Responsive font size */
+    font-size: clamp(1.4rem, 3vw, 1.8rem);
     font-weight: 500;
 }
 
-/* .candidate-card is already in your CSS, let's refine for the new theme */
 .candidate-card {
-    background-color: var(--vote-page-bg); /* White background for cards */
+    background-color: var(--vote-page-bg);
     border: 1px solid var(--vote-border-color);
     border-radius: 8px;
-    transition: box-shadow 0.3s ease;
-    height: 100%; /* For equal height cards in a row */
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    height: 100%;
     display: flex;
     flex-direction: column;
 }
 
 .candidate-card:hover {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    transform: translateY(-3px); /* Keep subtle lift */
+    transform: translateY(-3px);
 }
 
 .candidate-card .card-img-top {
     width: 100%;
-    height: 180px; /* Reduced height for image */
-    object-fit: cover; /* Fills the container, may crop */
+    height: 180px;
+    object-fit: cover;
     border-top-left-radius: calc(8px - 1px);
     border-top-right-radius: calc(8px - 1px);
 }
@@ -274,7 +498,7 @@ body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Pushes button to bottom */
+    justify-content: space-between;
 }
 
 .candidate-card .card-title {
@@ -291,8 +515,7 @@ body {
     margin-bottom: 1rem;
 }
 
-/* Custom checkbox styling for the voting page */
-.candidate-checkbox-input { /* The actual hidden checkbox */
+.candidate-checkbox-input {
     display: none;
 }
 
@@ -307,35 +530,35 @@ body {
     font-weight: 500;
     font-size: 0.95rem;
     text-align: center;
-    background-color: transparent; /* Transparent background initially */
+    background-color: transparent;
     color: var(--primary-color);
 }
 
 .custom-vote-checkbox-label:hover {
     background-color: var(--primary-color);
-    color: var(--text-color); /* White text on hover */
+    color: var(--text-color);
 }
 
 .candidate-checkbox-input:checked + .custom-vote-checkbox-label {
     background-color: var(--primary-color);
-    color: var(--text-color); /* White text when checked */
+    color: var(--text-color);
     font-weight: 700;
 }
 
 .candidate-checkbox-input:disabled + .custom-vote-checkbox-label {
-    background-color: #e9ecef; /* Standard disabled light gray */
+    background-color: #e9ecef;
     color: var(--vote-text-light);
     cursor: not-allowed;
     border-color: var(--vote-border-color);
 }
 
-/* .vote-btn from your new CSS - Ensure it's styled correctly */
-.vote-btn { /* This class is from your provided new CSS */
-    padding: 12px 30px !important; /* Bootstrap .btn might override, use !important if needed */
+/* .vote-btn: Existing style from previous input, kept as is per instruction not to change others unless specified */
+.vote-btn {
+    padding: 12px 30px !important;
     font-size: var(--responsive-font-size) !important;
     font-weight: bold !important;
     color: var(--text-color) !important;
-    background: var(--primary-color) !important; /* Overriding the #095a8c from your example if primary is preferred */
+    background: var(--primary-color) !important;
     border: none !important;
     border-radius: 10px !important;
     cursor: pointer;
@@ -343,26 +566,24 @@ body {
     align-items: center;
     justify-content: center;
     transition: transform 0.3s ease, background-color 0.3s ease !important;
-    margin: 20px auto 0;
+    margin: 20px auto 0; /* Centering if it's a block or display: block is added */
     box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3) !important;
 }
 
 .vote-btn:hover {
     transform: scale(1.05) !important;
-    background-color: #0a58ca !important; /* A darker shade of primary for hover */
-    color: var(--text-color) !important; /* Ensuring text color remains white */
+    background-color: color-mix(in srgb, var(--primary-color) 85%, black) !important;
+    color: var(--text-color) !important;
     box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Alert for no positions/candidates - using .notify-voting */
 .notify-voting {
-    background-color: var(--vote-container-bg) !important; /* Match position container bg */
+    background-color: var(--vote-container-bg) !important;
     color: var(--vote-text-medium) !important;
     border: 1px solid var(--vote-border-color) !important;
     font-size: 1.1rem;
+    border-radius: 0.25rem;
 }
-
-
 
 
 /* Live Results */
@@ -373,7 +594,7 @@ body {
     margin: 0;
     padding: 0;
     width: 100%;
-    background-color: white; /* Or var(--vote-page-bg) */
+    background-color: var(--vote-page-bg); /* Consistent with body bg */
 }
 
 .container_live #results-container {
@@ -385,11 +606,10 @@ body {
     color: var(--vote-text-dark);
     border: 2px solid var(--primary-color);
     border-radius: 15px;
-    padding: 20px; /* Increased padding */
-    margin: 5%; /* Removed 10% for wider content on smaller screens */
+    padding: 20px;
+    margin: 2.5% 5%; /* Slightly adjusted margin */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 
 
 /* About */
@@ -403,34 +623,34 @@ body {
     background-color: var(--vote-page-bg);
 }
 
-.container-about .row.about-content-row { /* Added a more specific class */
+.container-about .row.about-content-row {
     padding: 20px;
-    margin: 2.5% auto; /* Center the row */
-    max-width: 960px; /* Max width for content */
+    margin: 2.5% auto;
+    max-width: 960px;
     justify-content: center;
-    align-items: flex-start; /* Align items to top */
+    align-items: flex-start;
     border: 2px solid var(--primary-color);
     border-radius: 15px;
-    background-color: var(--vote-container-bg); /* Light bg for about content */
+    background-color: var(--vote-container-bg);
 }
 
 .card-about {
     align-items: center;
     justify-content: center;
-    width: 100%; /* Take full width of its column */
+    width: 100%;
     margin: 0 auto;
-    background-color: transparent; /* Assuming content is directly in .row */
-    border: none; /* Remove card border if content is direct */
+    background-color: transparent;
+    border: none;
 }
 
-.card-bodys { /* Assuming this is for text content within .card-about or .row */
+.card-bodys {
     color: var(--vote-text-dark);
     margin-bottom: 20px;
     font-size: 1rem;
     line-height: 1.6;
 }
 .card-bodys ul li {
-  font-style: normal; /* Changed from oblique for better readability */
+  font-style: normal;
   margin-bottom: 0.5rem;
 }
 
@@ -442,64 +662,38 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px;
-    min-height: 100vh; /* Use min-height */
+    padding: 40px 20px;
+    min-height: calc(100vh - 130px);
     width: 100%;
-    background: linear-gradient(to top, var(--background-gradient-start), var(--primary-color)); /* Ensure primary color is used */
+    background: linear-gradient(to top, var(--background-gradient-start), var(--primary-color));
+    box-sizing: border-box;
 }
 
-/* Footer */
-.container_f {
-    width: 100%;
-    background-color: var(--primary-color); /* Use primary color for footer bg */
-    color: var(--text-color); /* White text for footer */
-    padding-top: 20px; /* Add padding directly */
-    padding-bottom: 20px;
-}
-
-.container_f .row { /* Assuming Bootstrap row */
-    margin: 0 auto;
-    text-align: center;
-}
-
-.small-link {
-    color: var(--secondary-color); /* Use secondary for links in footer */
-    text-decoration: none;
-    font-size: var(--responsive-font-size);
-}
-
-.small-link:hover {
-    text-decoration: underline;
-    color: var(--link-hover-color);
-}
-
-.container_landing .row.landing-content-row { /* Specific class */
+.container_landing .row.landing-content-row {
     position: relative;
-    /* height: 80vh; */ /* Avoid fixed vh if content varies */
     text-align: center;
     width: 100%;
-    max-width: 800px; /* Constrain landing content width */
+    max-width: 800px;
 }
 
-.box-1 { /* Assuming this is for text content */
-    width: 100%; /* Make it responsive */
+.box-1 {
+    width: 100%;
     padding: 20px;
     margin-top: 30px;
 }
 
-.box-2 { /* Assuming this is for the button container */
+.box-2 {
     width: 100%;
-    /* position: absolute; bottom: 0; */ /* Avoid absolute if possible for flow */
-    margin-top: 20px; /* Space before button */
+    margin-top: 20px;
 }
 
-.box-1 a { /* Text link style */
+.box-1 a {
     font-size: var(--responsive-font-size);
     font-weight: bold;
     line-height: 1.5;
     color: var(--secondary-color);
-    transition: color 0.3s ease, transform 0.3s ease; /* Added transition */
-    display: inline-block; /* For transform to work */
+    transition: color 0.3s ease, transform 0.3s ease;
+    display: inline-block;
 }
 
 .box-1:hover a {
@@ -508,20 +702,48 @@ body {
     text-decoration: none;
 }
 
-/* Footer Styles */
-footer h5 { /* Assuming this is inside .container_f */
+/* Footer */
+footer {
+    margin: 0;
+    padding: 20px 0; /* Consistent padding top/bottom */
+    width: 100%;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+footer .container_f {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+footer .row {
+    /* margin-left: -15px; Counteract Bootstrap if .container_f doesn't have padding */
+    /* margin-right: -15px; */
+    text-align: center;
+}
+
+footer h5 {
     font-size: var(--responsive-font-size);
-    color: var(--text-color); /* Ensure it uses text-color from root */
+    color: var(--text-color);
     margin-bottom: 1rem;
 }
 
-footer img { /* If you have images in footer */
-    /* color: var(--secondary-color); */ /* SVGs might use fill, not color */
-    max-width: 100px; /* Example */
-    height: auto;
+.small-link {
+    color: var(--secondary-color);
+    text-decoration: none;
+    font-size: var(--responsive-font-size); /* This is quite large for a 'small' link */
+    /* Consider: font-size: 0.9rem; */
 }
 
-footer { /* Global footer tag */
-    margin: 0;
-    padding: 0; /* Reset default footer margins/paddings if any */
+.small-link:hover {
+    text-decoration: underline;
+    color: var(--link-hover-color);
+}
+
+footer img {
+    max-width: 100px;
+    height: auto;
+    margin-bottom: 10px;
 }

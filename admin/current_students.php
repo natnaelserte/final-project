@@ -15,7 +15,7 @@
                     <a href="download.php" class="btn btn-success ">
                         <i class="glyphicon glyphicon-save"></i> Import Students Data
                     </a>
-                    <a href="add_student_id.php" class="btn btn-success ">
+                    <a href="add_student.php" class="btn btn-success ">
                         <i class="glyphicon glyphicon-save"></i> Add Student ID
                     </a>
 

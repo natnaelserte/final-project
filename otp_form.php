@@ -85,14 +85,14 @@ if (isset($_GET['resend']) && $_GET['resend'] === "true") {
         $mail = new PHPMailer(true);
         try {
             // --- SERVER SETTINGS FOR MAILTRAP ---
-            $mail->SMTPDebug = SMTP::DEBUG_OFF; // Change to SMTP::DEBUG_SERVER for detailed logs if needed
+            $mail->SMTPDebug = SMTP::DEBUG_OFF; // Or you can use the number 4 for very verbose output // Change to SMTP::DEBUG_SERVER for detailed logs if needed
             $mail->isSMTP();
             $mail->Host       = 'sandbox.smtp.mailtrap.io';
             $mail->SMTPAuth   = true;
-            $mail->Username   = '3bd215eefe6968';                 // YOUR MAILTRAP USERNAME
-            $mail->Password   = '1c5fb4bbf20485'; // <<<< REPLACE WITH YOUR FULL MAILTRAP PASSWORD (e.g., ********0485)
+            $mail->Username   = '2c6302b1d58448';                 // YOUR MAILTRAP USERNAME
+            $mail->Password   = '2a4edeb25107e1'; // <<<< REPLACE WITH YOUR FULL MAILTRAP PASSWORD (e.g., ********0485)
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;   // Use STARTTLS
-            $mail->Port       = 587;                              // Port for STARTTLS
+            $mail->Port       = 2525;                              // Port for STARTTLS
 
             // Optional: Disable SSL verification for Mailtrap sandbox if you encounter SSL issues
             // This is generally safe for Mailtrap's sandbox environment during testing.
@@ -121,7 +121,7 @@ if (isset($_GET['resend']) && $_GET['resend'] === "true") {
             $_SESSION['otp_message_type'] = 'success';
 
         } catch (Exception $e) {
-            $_SESSION['otp_message'] = "Mailtrap Test Email Error: {$mail->ErrorInfo}. Check Mailtrap credentials/settings & PHP OpenSSL config.";
+            $_SESSION['otp_message'] = "Mailtrap Test Email Error: {$mail->ErrorInfo}.";
             $_SESSION['otp_message_type'] = 'danger';
             $log_user_id_catch = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'N/A';
             $log_username_catch = isset($session_username) ? $session_username : 'N/A';
@@ -265,7 +265,7 @@ if (file_exists('view_banner.php')) include('view_banner.php'); else echo "<!-- 
     ?>
     if (getCodeBtn) {
         getCodeBtn.addEventListener("click", () => {
-            getCodeBtn.disabled = true; getCodeBtn.innerText = "Processing...";
+            getCodeBtn.disabled = true; getCodeBtn.innerText = "Sending...";
             window.location.href = "?resend=true";
         });
     }

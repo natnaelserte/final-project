@@ -93,7 +93,7 @@ if (isset($_POST['next'])) {
     </style>
 </head>
 <body>
-<?php include('index_banner.php'); ?>
+<?php include('view_banner.php'); ?>
 <div class="form-container">
     <h2>Registration Form</h2>
     <p>Already have an account? <a href="#">Sign in</a></p>

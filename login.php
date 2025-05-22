@@ -7,11 +7,10 @@ include('head.php'); // Your HTML <head> etc.
 
 <body style="min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between;">
 
-<?php include('view_banner.php'); ?>
 
 <style>
     .container-login-custom {
-        margin-top: 50px;
+        margin-top: 0;
         margin-bottom: 50px;
         max-width: 530px;
         padding-left: 15px;
@@ -47,10 +46,12 @@ include('head.php'); // Your HTML <head> etc.
         border-radius: 4px;
     }
 </style>
+<?php include('view_banner.php'); ?>
 
 <div class="container-login-custom">
+    
     <div class="form-wrapper">
-        <h2 class="text-center">Welcome to User's Page</h2>
+        <h2 class="text-center">Welcome Back!</h2>
         <p class="text-center text-muted" style="margin-bottom: 25px;">Please login to continue</p>
 
         <div class="login-box">

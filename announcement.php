@@ -77,9 +77,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_read'])) {
     </style>
 </head>
 <body>
-<?php include('view_banner.php'); ?>
-
-<div class="container" style="margin-top: 30px; max-width: 700px;">
+    <?php include('view_banner.php'); ?>
+<div class="container" style=" max-width: 700px;">
 
     <h3 class="text-center">📢 Voting Announcements</h3>
 

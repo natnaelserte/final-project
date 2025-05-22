@@ -12,23 +12,22 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h3 class="page-header">Import From CSV Files</h3>
+                    <h3 class="page-header text-center  text-primary">Import From CSV Files</h3>
 					
                 </div>
-				
-				
-				
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                    </div>
+                    <!-- /.panel-heading -->
+                    <div class="panel-body">
                             <div class="table-responsive">
                                
 			<div class="span6" id="form-login">
 				<form class="form-horizontal well" action="import.php" method="post" name="upload_excel" enctype="multipart/form-data">
-					<fieldset>
-						<legend>Import CSV File</legend>
+					<fieldset style="min-width: 20vw !important;">
+						
 						<div class="control-group">
 							
 								<label>CSV :</label>

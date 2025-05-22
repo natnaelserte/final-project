@@ -1,29 +1,16 @@
 <?php
-// landing.php
-// session_start(); // If not already started by an included file like head.php
 require 'admin/dbcon.php'; // Ensure this path is correct
 include 'head.php'; // Assuming this includes Bootstrap CSS, jQuery
-
-// Include your navigation/header here. This should match the teal header in the image.
-// Example: include 'navbar.php';
-// For now, I'll add a placeholder for where your nav would go.
 ?>
-<!-- Placeholder for your actual navigation bar (e.g., included via PHP) -->
-<!-- <header class="navheader"> ... Your Navbar HTML ... </header> -->
-
-
 <?php
-// Logic for fetching and displaying the voting event notification
 $notificationMessage = ""; // Initialize
 $showCountdown = false;
 $endTimeForJS = 0; // Initialize
-
 try {
     $query = $pdo->prepare("SELECT * FROM voting_events WHERE is_active = 1 LIMIT 1");
     $query->execute();
     $votingEvent = $query->fetch(PDO::FETCH_ASSOC);
-
-    if ($votingEvent) {
+if ($votingEvent) {
         $title = htmlspecialchars($votingEvent['title']);
         $startTime = (int)$votingEvent['start_time'];
         $endTime = (int)$votingEvent['end_time'];
@@ -33,11 +20,10 @@ try {
         $endTimeFormatted = date("g:i A", $endTime);
 
         if (time() > $endTime) {
-            // Deactivation logic (consider moving to a cron or admin action for production)
-            // $updateVotersStmt = $pdo->prepare("UPDATE voters SET account = 'Inactive'");
-            // $updateVotersStmt->execute();
-            // $updateEventStmt = $pdo->prepare("UPDATE voting_events SET is_active = 0 WHERE id = ?");
-            // $updateEventStmt->execute([$votingEvent['id']]);
+             $updateVotersStmt = $pdo->prepare("UPDATE users SET account = 'Inactive'");
+            $updateVotersStmt->execute();
+             $updateEventStmt = $pdo->prepare("UPDATE voting_events SET is_active = 0 WHERE id = ?");
+            $updateEventStmt->execute([$votingEvent['id']]);
             $notificationMessage = "The voting event '<strong>" . $title . "</strong>' has ended.";
             $showCountdown = false;
         } else {
@@ -48,7 +34,7 @@ try {
         $notificationMessage = "No active voting event at this time.";
     }
 } catch (PDOException $e) {
-    $notificationMessage = 'Error: Could not retrieve voting event information.';
+    $notificationMessage = 'Error: Could not retrieve voting event information';
     error_log("Error fetching voting event: " . $e->getMessage());
 }
 ?>
@@ -66,11 +52,7 @@ try {
 
     <!-- Hero Section with Background Image Slider -->
     <section class="hero-section">
-        <?php /* The <!DOCTYPE html>, <html>, <head> inside a <section> is not valid HTML.
-                 These should ideally be part of the main document structure, likely handled by head.php.
-                 However, per your instruction "don't change anything", I am adding the CSS to the existing style block.
-                 For correct structure, these styles should be in the main <head> of the document. */ ?>
-        <head> <?php /* This <head> tag here is structurally incorrect in HTML */ ?>
+        <head> 
           <meta charset="UTF-8">
           <title>Auto Hero Slider</title>
           <style>
@@ -167,8 +149,6 @@ try {
     slides[0].classList.add('active'); // Initialize first slide
   }
 </script>
-
-
 
         <div class="hero-overlay"></div>
         <div class="hero-content text-center">

@@ -1,6 +1,6 @@
 <?php
 include('sess.php');
-require 'admin/bcon.php';
+require 'admin/dbcon.php';
 
 // Function to generate OTP
 function generateOTP($length = 6) {

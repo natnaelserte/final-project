@@ -3,6 +3,7 @@ include('sess.php'); // Keep session management
 ?>
 <?php include('head.php'); ?>
 <body>
+    <?php include('side_bar.php'); ?>
     <div id="wrapper">
         <!-- Navigation -->
         
