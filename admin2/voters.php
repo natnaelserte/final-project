@@ -89,11 +89,7 @@ try {
                 <i class="fa fa-female"></i> Female <span class="badge badge-light"><?php echo htmlspecialchars($count4['total']); ?></span>
             </a>
         </div>
-        <div class="col-xs-12 col-sm-4" style="padding: 5px;">
-            <button type="button" class="btn btn-danger btn-block btn-lg" data-toggle="modal" data-target="#deleteAllVotersModal" style="font-weight: 700;">
-                <i class="fa fa-trash"></i> Delete All Voters
-            </button>
-        </div>
+       
     </div>
 </div>
 

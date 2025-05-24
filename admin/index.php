@@ -1,257 +1,422 @@
-<?php include('session.php'); ?>
-<?php include('head.php'); // Ensure head.php links to the updated CSS file ?>
+<?php include 'session.php'; // Include your head content ?>
+<?php
 
+// --- SESSION AND COMMON INCLUDES ---
+require_once 'dbcon.php'; // Your database connection
+// --- REDIRECT IF NOT LOGGED IN (Example - adapt to your login check) ---
+if (!isset($_SESSION['user_id'])) { // Assuming 'user_id' is set upon successful login
+    header("Location: login.php"); // Redirect to your login page
+    exit();
+}
+ 
+// --- FETCH USERNAME FOR PAGE TITLE OR OTHER USES ---
+$loggedInUserFirstName = "Admin"; // Default
+$pageTitlePrefix = "";
+if (isset($_SESSION['user_id'])) {
+    try {
+        $stmtUser = $pdo->prepare("SELECT firstname FROM users WHERE user_id = :user_id");
+        $stmtUser->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
+        $stmtUser->execute();
+        if ($userRow = $stmtUser->fetch(PDO::FETCH_ASSOC)) {
+            $loggedInUserFirstName = htmlspecialchars($userRow['firstname']);
+            $pageTitlePrefix = $loggedInUserFirstName . "'s ";
+        }
+    } catch (PDOException $e) {
+        error_log("Error fetching admin name for dashboard title: " . $e->getMessage());
+    }
+}
+
+// --- DATABASE QUERIES FOR STATS ---
+$stats = [
+    'total_voters' => 0,
+    'active_voters' => 0,
+    'inactive_voters' => 0,
+    'gender_counts' => ['male' => 0, 'female' => 0], // Initialize to avoid errors if no data
+    'batch_counts' => [],
+    'recent_registrations' => [],
+    'locked_accounts_count' => 0,
+];
+
+try {
+    // For these dashboard stats, we are counting users with role_id = 3 as "voters".
+    // If "Staff" also have role_id = 3 and should NOT be counted, you need an additional
+    // condition to differentiate them (e.g., another column like 'user_type').
+    // For now, role_id = 3 will include both voters and staff if they share that ID.
+    $target_role_id = 3;
+
+    // Total "Voters/Staff" (role_id = 3)
+    $stmtTotal = $pdo->prepare("SELECT COUNT(*) FROM users WHERE role_id = :role_id");
+    $stmtTotal->execute(['role_id' => $target_role_id]);
+    $stats['total_voters'] = $stmtTotal->fetchColumn();
+
+    // Active "Voters/Staff"
+    $stmtActive = $pdo->prepare("SELECT COUNT(*) FROM users WHERE account = 'Active' AND role_id = :role_id");
+    $stmtActive->execute(['role_id' => $target_role_id]);
+    $stats['active_voters'] = $stmtActive->fetchColumn();
+
+    // Inactive "Voters/Staff"
+    $stmtInactive = $pdo->prepare("SELECT COUNT(*) FROM users WHERE (account = 'Inactive' OR account IS NULL) AND role_id = :role_id");
+    $stmtInactive->execute(['role_id' => $target_role_id]);
+    $stats['inactive_voters'] = $stmtInactive->fetchColumn();
+
+    // "Voters/Staff" by Gender (Normalize 'male' and 'Male', 'female' and 'Female')
+    $stmtGender = $pdo->prepare("SELECT LOWER(gender) as gender_group, COUNT(*) as count 
+                                FROM users 
+                                WHERE role_id = :role_id AND gender IS NOT NULL AND TRIM(gender) != '' 
+                                GROUP BY gender_group");
+    $stmtGender->execute(['role_id' => $target_role_id]);
+    $genderResults = $stmtGender->fetchAll(PDO::FETCH_KEY_PAIR);
+    $stats['gender_counts']['male'] = $genderResults['male'] ?? 0; // Handle 'male'
+    $stats['gender_counts']['female'] = $genderResults['female'] ?? 0; // Handle 'female'
+    // If you have other gender strings like 'Male' with uppercase, the LOWER() handles it.
+
+    // "Voters/Staff" by Batch (Extract last part of id_number after the last '/')
+    $stmtBatch = $pdo->prepare("SELECT SUBSTRING_INDEX(id_number, '/', -1) as batch, COUNT(*) as count 
+                                FROM users 
+                                WHERE role_id = :role_id AND id_number IS NOT NULL AND TRIM(id_number) != ''
+                                GROUP BY batch 
+                                ORDER BY CAST(batch AS UNSIGNED) ASC, batch ASC");
+    $stmtBatch->execute(['role_id' => $target_role_id]);
+    $stats['batch_counts'] = $stmtBatch->fetchAll(PDO::FETCH_ASSOC);
+
+    // Recent Registrations (of "Voters/Staff")
+    $stmtRecent = $pdo->prepare("SELECT firstname, lastname, registration_date 
+                                FROM users 
+                                WHERE role_id = :role_id AND registration_date IS NOT NULL
+                                ORDER BY registration_date DESC, user_id DESC LIMIT 5");
+    $stmtRecent->execute(['role_id' => $target_role_id]);
+    $stats['recent_registrations'] = $stmtRecent->fetchAll(PDO::FETCH_ASSOC);
+
+    // Locked "Voter/Staff" Accounts
+    $stmtLocked = $pdo->prepare("SELECT COUNT(*) FROM users WHERE is_locked = 1 AND role_id = :role_id");
+    $stmtLocked->execute(['role_id' => $target_role_id]);
+    $stats['locked_accounts_count'] = $stmtLocked->fetchColumn();
+
+} catch (PDOException $e) {
+    $db_error_message = "Database error fetching stats: " . htmlspecialchars($e->getMessage());
+    error_log($db_error_message); // Log detailed error
+}
+
+// Prepare data for Chart.js
+$genderChartLabels = json_encode(array_map('ucfirst', array_keys($stats['gender_counts']))); // Capitalize 'male', 'female'
+$genderChartData = json_encode(array_values($stats['gender_counts']));
+
+$batchChartLabels = json_encode(array_column($stats['batch_counts'], 'batch'));
+$batchChartData = json_encode(array_column($stats['batch_counts'], 'count'));
+
+include 'head.php'; // Include your head content
+?>
+
+<!DOCTYPE html> <!-- This DOCTYPE might already be in head.php -->
+<html lang="en">  <!-- This lang might already be in head.php -->
+<head>
+    <!-- Meta tags, etc., are likely in head.php -->
+    <title><?php echo $pageTitlePrefix; ?>Admin Dashboard</title>
+    <!-- Link to your main admin CSS (e.g., from SB Admin or your custom one) -->
+    <!-- Ensure this path is correct and it includes Bootstrap or your framework's CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css"> <!-- Example Bootstrap CSS -->
+    <link rel="stylesheet" href="css/sb-admin.css"> <!-- Example SB Admin CSS -->
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css"> <!-- Example Font Awesome -->
+
+    <!-- NEW CSS for dashboard specific styles -->
+    <link rel="stylesheet" href="css/dashboard.css">
+    <!-- Google Fonts (if not already in head.php) -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
 <body>
-    <div id="wrapper">
+ 
 
-        <!-- Navigation -->
-        <?php include('side_bar.php'); ?>
+    <div id="wrapper"> <!-- Common wrapper for SB Admin like templates -->
+     
+        <?php include 'side_bar.php'; // Your existing sidebar, which includes the top navbar ?>
 
-        <!-- Page Content -->
-        <div id="page-wrapper">
+        <div id="page-wrapper"> <!-- Main content area for SB Admin like templates -->
+            <div class="container-fluid">
 
-            <div class="row" style="margin-bottom: 20px;"> <!-- Added a row for these buttons -->
-                <div class="col-md-6">
-                   
-                    <!-- Export and Account Actions -->
-                    <?php
-                    $editMode = false;
-                    try {
-                        $query = $pdo->prepare("SELECT * FROM voting_events WHERE is_active = 1");
-                        $query->execute();
-                        $votingEvent = $query->fetch(PDO::FETCH_ASSOC);
-                        $editMode = (bool)$votingEvent;
-
-                        if ($editMode) {
-                            // Edit button - Outline Warning Style
-                            echo '<button type="button" class="btn btn-custom btn-custom-outline btn-warning-custom btn-lg btn-block " data-toggle="modal" data-target="#votingModal">
-                                    <i class="fa fa-pencil-square-o"></i> Edit Voting
-                                  </button>';
-                        } else {
-                            // Initiate button - Solid Primary Style
-                            echo '<button type="button" class="btn btn-custom btn-custom-solid btn-info-custom btn-lg btn-block " data-toggle="modal" data-target="#votingModal">
-                                    <i class="fa fa-check-square-o"></i> Initiate Voting
-                                  </button>';
-                        }
-                    } catch (PDOException $e) {
-                        echo "<div class='alert alert-danger'>Error: " . htmlspecialchars($e->getMessage()) . "</div>";
-                    }
-                    ?>
-                    <!-- Removed an empty .row.mb-4 that was here -->
-                    <!-- The buttons below are now in their own row or column structure for clarity -->
-                </div>
-                <div class="col-md-6" style="margin-bottom: 10px;"> <!-- Full width for export button -->
-                    <a href="voters_excel.php" class="btn btn-custom btn-custom-solid btn-info-custom btn-lg btn-block">
-                        <i class="fa fa-file-excel-o"></i> Export Voters to Excel
-                    </a>
-                </div>
-            
-                <!-- Stylish Activation/Deactivation Buttons -->
-                <div class="col-md-6">
-                    <a href="activate_accounts.php" class="btn btn-custom btn-custom-solid btn-success-custom btn-lg btn-block">
-                        <i class="fa fa-check-circle"></i> Activate Voter Accounts
-                    </a>
-                </div>
-                <div class="col-md-6">
-                    <a href="deactivate_accounts.php" class="btn btn-custom btn-custom-solid btn-danger-custom btn-lg btn-block">
-                        <i class="fa fa-times-circle"></i> Deactivate Voter Accounts
-                    </a>
-                </div>
-            </div>
-
-            <!-- Voter Table -->
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <i class="fa fa-users"></i> Voters List
-                </div>
-                <div class="panel-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered table-hover" id="dataTables-example">
-                            <thead>
-                                <tr>
-                                    <th>Student ID</th>
-                                    <th>Names</th>
-                                    <th>Gender</th>
-                                    <th>Phone</th>
-                                    <th>Status</th>
-                                    <th>Account</th>
-                                    <th>Date Registered</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                // require 'dbcon.php'; // Assuming dbcon.php contains $pdo and is already included or available
-                                $queryUsers = $pdo->query("SELECT * FROM users WHERE role_id = 3 ORDER BY user_id DESC");
-                                while ($row1 = $queryUsers->fetch(PDO::FETCH_ASSOC)) {
-                                    $user_id = htmlspecialchars($row1['user_id']);
-                                    $account = htmlspecialchars($row1['account']);
-                                ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($row1['id_number']); ?></td>
-                                        <td><?php echo htmlspecialchars($row1['firstname'] . " " . $row1['lastname']); ?></td>
-                                        <td><?php echo htmlspecialchars($row1['gender']); ?></td>
-                                        <td><?php echo htmlspecialchars($row1['phone']); ?></td>
-                                        <td><?php echo htmlspecialchars($row1['status']); ?></td>
-                                        <td><?php echo $account; // Already escaped ?></td>
-                                        <td><?php echo htmlspecialchars($row1['registration_date']); ?></td>
-                                        <td>
-                                            <?php if ($account == 'Inactive') { ?>
-                                                <a href="activate_voter.php?user_id=<?php echo $user_id; ?>" class="btn btn-success btn-sm">Activate</a>
-                                            <?php } else { ?>
-                                                <a href="deactivate_voter.php?user_id=<?php echo $user_id; ?>" class="btn btn-warning btn-sm">Deactivate</a>
-                                            <?php } ?>
-                                        </td>
-                                    </tr>
-                                <?php } ?>
-                            </tbody>
-                        </table>
+                <!-- Page Heading -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">
+                            Dashboard <small>Statistics Overview</small>
+                        </h1>
+                        <ol class="breadcrumb">
+                            <li class="active">
+                                <i class="fa fa-dashboard"></i> Dashboard
+                            </li>
+                        </ol>
                     </div>
                 </div>
-            </div>
+                <!-- /.row -->
 
-            <!-- Voter Count Boxes and Chart -->
-            <?php
-            // Ensure PDO connection is available
-            $activeCount = 0;
-            $inactiveCount = 0;
-            if (isset($pdo)) {
-                $activeCount = $pdo->query("SELECT COUNT(*) FROM users WHERE account = 'Active' AND role_id = 3")->fetchColumn();
-                $inactiveCount = $pdo->query("SELECT COUNT(*) FROM users WHERE account = 'Inactive' AND role_id = 3")->fetchColumn();
-            }
-            ?>
+                <?php if (isset($db_error_message)): ?>
+                    <div class="alert alert-danger">
+                        <strong>Error!</strong> <?php echo "Could not load all dashboard statistics. Please check system logs or contact support."; ?>
+                    </div>
+                <?php endif; ?>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="panel panel-success">
-                        <div class="panel-heading">Active Voters</div>
-                        <div class="panel-body text-center">
-                            <h2><?php echo $activeCount; ?></h2>
+                <!-- Stat Cards Row 1 -->
+                <div class="row">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-users fa-2x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="huge"><?php echo htmlspecialchars($stats['total_voters']); ?></div>
+                                        <div>Total Voters(Role 3)</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="voters.php"> <!-- CHANGE voters.php IF YOUR VOTER LIST PAGE IS DIFFERENT -->
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                    <i class="fa fa-users fa-2x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="huge"><?php echo htmlspecialchars($stats['active_voters']); ?></div>
+                                        <div>Active (Role 3)</div>
+                                    </div>
+                                </div>
+                            </div>
+                             <a href="voters.php?account_status=active"> <!-- Example: Link to pre-filtered list -->
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                    <i class="fa fa-users fa-1x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="huge"><?php echo htmlspecialchars($stats['inactive_voters']); ?></div>
+                                        <div>Inactive (Role 3)</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="voters.php?account_status=inactive">
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <?php if ($stats['locked_accounts_count'] > 0): ?>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="panel panel-red">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                    <i class="fa fa-users fa-1x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="huge"><?php echo htmlspecialchars($stats['locked_accounts_count']); ?></div>
+                                        <div>Locked (Role 3)!</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="locked_accounts_view.php"> <!-- You will need to create this page -->
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                </div>
+                <!-- /.row -->
+
+                <!-- Charts and Lists Row 2 -->
+                <div class="row">
+                    <div class="col-lg-6 col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa fa-venus-mars fa-fw"></i> By Gender (Role 3)</h3>
+                            </div>
+                            <div class="panel-body">
+                                <canvas id="genderPieChart" style="max-height: 250px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="col-lg-6 col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa fa-layer-group fa-fw"></i> By Batch (Role 3)</h3>
+                            </div>
+                            <div class="panel-body" style="max-height: 290px; overflow-y: auto;">
+                                <?php if (!empty($stats['batch_counts'])): ?>
+                                <canvas id="batchBarChart" style="min-height: 250px;"></canvas>
+                                <?php else: ?>
+                                <p>No batch data available for users with role ID 3.</p>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="panel panel-danger">
-                        <div class="panel-heading">Inactive Voters</div>
-                        <div class="panel-body text-center">
-                            <h2><?php echo $inactiveCount; ?></h2>
+                <!-- /.row -->
+
+                <!-- Quick Links and Recent Reg Row 3 -->
+                <div class="row">
+                    <div class="col-lg-6 col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa fa-link fa-fw"></i> Quick Links</h3>
+                            </div>
+                            <div class="panel-body quick-links">
+                                <a href="voters.php" class="btn btn-default btn-lg btn-block"><i class="fa fa-users fa-fw"></i> View Voters/Staff List</a>
+                                <a href="activate_accounts.php" class="btn btn-success btn-lg btn-block"><i class="fa fa-toggle-on fa-fw"></i> Activate Accounts</a>
+                                <a href="deactivate_accounts.php" class="btn btn-danger btn-lg btn-block"><i class="fa fa-toggle-off fa-fw"></i> Deactivate Accounts</a>
+                               
+                                <!-- Add more links as needed -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa fa-history fa-fw"></i> Recent Registrations (Role 3)</h3>
+                            </div>
+                            <div class="panel-body" style="max-height: 330px; overflow-y: auto;">
+                                <div class="list-group">
+                                    <?php if (!empty($stats['recent_registrations'])): ?>
+                                        <?php foreach ($stats['recent_registrations'] as $reg): ?>
+                                            <div class="list-group-item"> <!-- Changed to div for better control if links are not needed -->
+                                                <i class="fa fa-user fa-fw"></i> <?php echo htmlspecialchars($reg['firstname'] . " " . $reg['lastname']); ?>
+                                                <span class="pull-right text-muted small"><em><?php echo date("M d, Y", strtotime($reg['registration_date'])); ?></em></span>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <p class="list-group-item">No recent registrations for users with role ID 3.</p>
+                                    <?php endif; ?>
+                                </div>
+                                <?php if(count($stats['recent_registrations']) >=5 ): ?>
+                                <a href="voters.php?sort=registration_date_desc" class="btn btn-default btn-block">View All Registrations</a>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <!-- /.row -->
+
             </div>
-
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <i class="fa fa-pie-chart"></i> Voter Account Distribution
-                </div>
-                <div class="panel-body">
-                    <div id="voterPieChart" style="height: 400px;"></div>
-                </div>
-            </div>
-        </div> <!-- /#page-wrapper -->
-    </div> <!-- /#wrapper -->
-
-    <!-- Voting Modal -->
-    <div class="modal fade" id="votingModal" tabindex="-1" role="dialog" aria-labelledby="votingModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form id="initiateVotingForm">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="votingModalLabel">
-                            <?php echo $editMode ? "Edit Voting" : "Initiate Voting"; ?>
-                        </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="votingTitle">Voting Title</label>
-                            <input type="text" class="form-control" id="votingTitle" placeholder="Enter voting title" required
-                            <?php
-                            if ($editMode && isset($votingEvent['title'])) {
-                                echo ' value="' . htmlspecialchars($votingEvent['title']) . '"';
-                            }
-                            ?>>
-                        </div>
-                        <div class="form-group">
-                            <label for="votingHours">Voting Duration (Hours)</label>
-                            <input type="number" class="form-control" id="votingHours" placeholder="Enter duration in hours" min="1" required
-                            <?php
-                            // If you want to prefill duration in edit mode, fetch and echo it here too.
-                            // Example:
-                            if ($editMode && isset($votingEvent['duration_hours'])) {
-                                echo ' value="' . htmlspecialchars($votingEvent['duration_hours']) . '"';
-                            }
-                            ?>>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-custom btn-custom-outline btn-secondary-custom" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-custom btn-custom-solid btn-primary-custom" id="confirmVoting">Confirm</button>
-                    </div>
-                </form>
-            </div>
+            <!-- /.container-fluid -->
         </div>
+        <!-- /#page-wrapper -->
+
     </div>
+    <!-- /#wrapper -->
 
-    <?php include('script.php'); ?>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins if your template uses them) -->
+    <script src="js/jquery.js"></script> <!-- Adjust path as needed -->
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script> <!-- Adjust path as needed -->
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        $(document).ready(function () {
-            $('#confirmVoting').click(function () {
-                const title = $('#votingTitle').val();
-                const hours = $('#votingHours').val();
-
-                if (title && hours) {
-                    $.ajax({
-                        type: 'POST',
-                        url: 'initiate_voting.php', // Ensure this path is correct
-                        data: {
-                            title: title,
-                            hours: hours,
-                            edit: <?php echo $editMode ? 'true' : 'false'; ?>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Gender Pie Chart
+        const genderCtx = document.getElementById('genderPieChart');
+        if (genderCtx && <?php echo $genderChartData; ?>.reduce((a, b) => a + b, 0) > 0) { // Only render if there's data
+            new Chart(genderCtx, {
+                type: 'pie',
+                data: {
+                    labels: <?php echo $genderChartLabels; ?>,
+                    datasets: [{
+                        label: 'Users by Gender',
+                        data: <?php echo $genderChartData; ?>,
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.8)', // Blueish
+                            'rgba(255, 99, 132, 0.8)', // Pinkish
+                            'rgba(255, 206, 86, 0.8)', 
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)'
+                        ],
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
                         },
-                        success: function (response) {
-                            // It's better to parse the response if it's JSON
-                            // For now, assuming plain text response
-                            alert(response); 
-                            $('#votingModal').modal('hide');
-                            location.reload(); // Reload to see changes
-                        },
-                        error: function (xhr, status, error) {
-                            console.error("AJAX Error: " + status + " - " + error);
-                            alert("An error occurred while submitting voting data. Details: " + xhr.responseText);
+                        title: {
+                            display: false,
                         }
-                    });
-                } else {
-                    alert('Please fill in all fields.');
+                    }
                 }
             });
+        } else if(genderCtx) {
+            genderCtx.getContext('2d').fillText("No gender data available for role ID 3.", genderCtx.width / 2 - 60, genderCtx.height / 2);
+        }
 
-            // Google Charts
-            google.charts.load('current', {'packages':['corechart']});
-            google.charts.setOnLoadCallback(drawChart);
-
-            function drawChart() {
-                var data = google.visualization.arrayToDataTable([
-                    ['Account Status', 'Count'],
-                    ['Active', <?php echo intval($activeCount); // Ensure integer ?>],
-                    ['Inactive', <?php echo intval($inactiveCount); // Ensure integer ?>]
-                ]);
-
-                var options = {
-                    title: 'Voter Account Status',
-                    is3D: true,
-                    colors: ['#28a745', '#dc3545'] // Green for Active, Red for Inactive
-                };
-
-                var chart = new google.visualization.PieChart(document.getElementById('voterPieChart'));
-                chart.draw(data, options);
-            }
-        });
+        // Batch Bar Chart
+        const batchCtx = document.getElementById('batchBarChart');
+        if (batchCtx && <?php echo $batchChartData; ?>.length > 0) { // Only render if there's data
+             new Chart(batchCtx, {
+                type: 'bar',
+                data: {
+                    labels: <?php echo $batchChartLabels; ?>,
+                    datasets: [{
+                        label: 'Users per Batch',
+                        data: <?php echo $batchChartData; ?>,
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y', // Makes it a horizontal bar chart if many batches
+                    scales: {
+                        x: { // Changed from y to x for horizontal bar
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1 
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                         title: {
+                            display: false,
+                        }
+                    }
+                }
+            });
+        } else if (batchCtx) {
+             batchCtx.getContext('2d').fillText("No batch data available for role ID 3.", batchCtx.width / 2 - 60, batchCtx.height / 2);
+        }
+    });
     </script>
 </body>
 </html>

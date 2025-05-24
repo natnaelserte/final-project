@@ -1,0 +1,169 @@
+/* style_deactivate.css */
+
+:root {
+    --primary-color: #dc3545; /* "Danger" red for deactivation */
+    --primary-hover-color: #c82333;
+    --secondary-color: #ffc107; /* "Warning" amber for "all" */
+    --secondary-hover-color: #e0a800;
+    --light-gray-color: #f8f9fa;
+    --medium-gray-color: #e9ecef;
+    --dark-gray-color: #6c757d;
+    --text-color: #343a40;
+    --border-color: #ced4da;
+    --success-bg: #d4edda;
+    --success-text: #155724;
+    --success-border: #c3e6cb;
+    --error-bg: #f8d7da;
+    --error-text: #721c24;
+    --error-border: #f5c6cb;
+    --white-color: #ffffff;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --border-radius: 8px;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0px;
+    background-color: var(--light-gray-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 650px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: var(--white-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+h2 {
+    text-align: center;
+    color: var(--primary-color); /* Using primary color for heading */
+    margin-bottom: 25px;
+    font-weight: 500;
+    border-bottom: 1px solid var(--medium-gray-color);
+    padding-bottom: 15px;
+}
+
+p.instructions {
+    text-align: center;
+    margin-bottom: 25px;
+    color: var(--dark-gray-color);
+    font-size: 0.95em;
+}
+
+label { 
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+select,
+input[type="submit"],
+button[type="button"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    box-sizing: border-box;
+    font-size: 1em;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+select:focus,
+input[type="submit"]:focus,
+button[type="button"]:focus {
+    outline: none;
+    border-color: var(--primary-color); /* Focus uses primary color */
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25); /* Adjusted for red */
+}
+
+select {
+    background-color: var(--white-color);
+    appearance: none; 
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23dc3545%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); /* Arrow color changed */
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
+    padding-right: 40px; 
+}
+
+input[type="submit"],
+button[type="button"] {
+    color: var(--white-color);
+    cursor: pointer;
+    font-weight: 500;
+    border: none;
+}
+
+input[type="submit"] { /* Conditional deactivation button */
+    background-color: var(--primary-color);
+}
+input[type="submit"]:hover {
+    background-color: var(--primary-hover-color);
+}
+
+button.deactivate-all { /* Deactivate all button */
+    background-color: var(--secondary-color);
+    color: var(--text-color); /* Darker text for better contrast on amber */
+}
+button.deactivate-all:hover {
+    background-color: var(--secondary-hover-color);
+}
+
+.message {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    font-size: 0.95em;
+}
+.message.error {
+    background-color: var(--error-bg);
+    color: var(--error-text);
+    border: 1px solid var(--error-border);
+}
+.message.success { 
+    background-color: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
+}
+
+.form-group {
+    margin-bottom: 25px;
+    padding: 20px;
+    border: 1px solid var(--medium-gray-color);
+    border-radius: var(--border-radius);
+    background-color: var(--light-gray-color); 
+}
+.form-group legend {
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: var(--primary-color); /* Legend color */
+    font-size: 1.1em;
+}
+.form-group label { 
+    display: inline-flex; 
+    align-items: center; 
+    margin-right: 20px;
+    font-weight: 400; 
+    color: var(--text-color);
+    cursor: pointer;
+}
+.form-group input[type="radio"] {
+    width: auto;
+    margin-right: 8px;
+    transform: scale(1.1); 
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), var(--border-color), rgba(0, 0, 0, 0));
+    margin: 35px 0;
+}

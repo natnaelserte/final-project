@@ -37,7 +37,10 @@
                     <a href="#"><i class="fa fa-menu fa-fw"></i> Menu</a>
                 </li>
                 <li>
-                    <a href="index.php"><i class="fa fa-user fa-fw"></i> Voters</a>
+                    <a href="index.php"><i class="fa fa-user fa-fw"></i> dashboard</a>
+                </li>
+                <li>
+                    <a href="voters.php"><i class="fa fa-user fa-fw"></i> Voters</a>
                 </li>
                 <li>
                     <a href="user.php"><i class="fa fa-users"></i> View User</a>

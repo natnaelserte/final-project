@@ -1,265 +1,314 @@
+
 <?php include('head.php'); ?>
 <head>
     <style>
-        .candidate-image {
+        .candidate-image-live { /* Renamed to avoid conflict if .candidate-image is global */
             width: 50px;
             height: 50px;
-            border-radius: 50%;a
+            border-radius: 50%;
             object-fit: cover;
+            margin-right: 10px; /* Added margin for spacing */
         }
         .dashboard-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #0d47a1;
-}
-.chart-container {
-  position: relative;
-  height: auto;
-}
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #0d47a1;
+        }
+        .chart-container-live { /* Renamed for clarity */
+            position: relative;
+            height: auto;
+            margin-bottom: 20px; /* Added margin */
+        }
 
-
-        /* Add a media query for smaller screens */
         @media (max-width: 767.98px) {
-            .candidate-image {
+            .candidate-image-live {
                 width: 40px;
                 height: 40px;
             }
-
             .table-responsive {
                 overflow-x: auto;
             }
         }
 
-        /* Style for the leading candidate */
-        .leading-candidate {
-            background-color:rgb(147, 139, 179); /* Green background for leading candidate */
-         
+        /* Style for the leading candidate in the table view */
+        .leading-candidate-table {
+            background-color: rgb(147, 139, 179);
             font-weight: bold;
             border-radius: 5px;
         }
 
-        /* Styling for position titles */
-        .position-title {
-            color:rgb(6, 61, 120);
+        /* Styling for position titles in table view */
+        .position-title-table {
+            color: rgb(6, 61, 120);
             font-weight: 700;
             font-size: 1.8em;
             text-align: center;
             margin-bottom: 20px;
         }
 
-        /* Styling for the container */
-        .container_live {
+        .container_live_page { /* Renamed for clarity */
             padding: 20px;
             background-color: #f9fafb;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 6);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Adjusted shadow */
+        }
+
+        /* Styles for the report-like bar graphs */
+        .live-candidate-results {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px; /* Spacing between positions */
+        }
+        .live-candidate-results .candidate-bar-container {
+            margin-bottom: 15px; /* Spacing between candidates */
+        }
+        .live-candidate-results strong {
+            display: block; /* Make strong take full width for better layout */
+            margin-bottom: 3px;
+        }
+        .live-candidate-results .vote-details {
+            float: right;
+            font-size: 0.9em;
+        }
+        .live-candidate-results .progress-bar-custom {
+            position: relative;
+            height: 30px;
+            background: #e6e6e6;
+            border-radius: 15px; /* Smoother radius */
+            margin-top: 5px;
+            overflow: hidden; /* Ensure inner bar stays within bounds */
+        }
+        .live-candidate-results .progress-bar-fill {
+            height: 100%;
+            border-radius: 15px;
+            transition: width 0.5s ease-in-out; /* Smooth transition for width changes */
+        }
+        .live-candidate-results .candidate-avatar-on-bar {
+            position: absolute;
+            top: -5px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+            object-fit: cover;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+            transition: left 0.5s ease-in-out; /* Smooth transition for position */
+        }
+
+        /* Summary Box Styles (from your example) */
+        .summary-box {
+          padding: 10px 15px; /* Adjusted padding */
+          border-radius: 8px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+          margin-bottom: 10px; /* Spacing for mobile */
+        }
+        .summary-box h6 {
+          font-size: 0.9rem; /* Slightly smaller */
+          margin-bottom: 3px;
+        }
+        .summary-box h4 {
+          font-size: 1.3rem; /* Slightly smaller */
+          margin: 0;
         }
     </style>
 </head>
-
+<?php include('view_banner.php'); ?>
 <body>
-    <?php include('view_banner.php'); ?>
-    <div class="container_live">
-        <h2 class="text-center mt-4">Real-Time Voting Results</h2>
-        <div id="results-container" class="table-responsive">
-            <!-- Voting results will be displayed here -->
+    <?php // include('view_banner.php'); // Uncomment if you use this ?>
+    <div class="container_live_page">
+        <h2 class="text-center mt-4 mb-4">Real-Time Voting Results</h2>
+
+        <!-- Live Table Results Section (Optional - Keep if you want both table and graph views) -->
+        <div id="live-table-results-container" class="table-responsive mb-5">
+            <!-- Table-based voting results will be displayed here -->
+            <p class="text-center">Loading table results...</p>
         </div>
-        <!-- Dashboard Section Start -->
-<div class="container m-6">
-  <h2 class="text-center m-6">📊 Dashboard Summary</h2>
-<!-- 📦 Voting Summary Boxes -->
-<div class="container my-4">
-  <div class="row text-center justify-content-center m-6">
-    <!-- Total Candidates -->
-    <div class="col-12  mb-2">
-      <div class="summary-box" style="background-color: #0d1b2a; color: white;">
-        <h6>Total Candidates</h6>
-        <h4 id="total-candidates">--</h4>
-      </div>
+        <hr>
+
+        <!-- Dashboard Summary Section -->
+        <div class="container mb-5">
+          <h2 class="text-center mb-4">📊 Dashboard Summary</h2>
+            <div class="row text-center justify-content-center">
+                <div class="col-md-4 col-sm-6 col-12">
+                  <div class="summary-box" style="background-color: #0d1b2a; color: white;">
+                    <h6>Total Candidates</h6>
+                    <h4 id="total-candidates">--</h4>
+                  </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-12">
+                  <div class="summary-box" style="background-color: #0d1b2a; color: white;">
+                    <h6>Total Votes Cast</h6>
+                    <h4 id="total-votes">--</h4>
+                  </div>
+                </div>
+                <div class="col-md-4 col-sm-12 col-12">
+                  <div class="summary-box" style="background-color: #0d1b2a; color: white;">
+                    <h6>Total Positions</h6>
+                    <h4 id="total-positions">--</h4>
+                  </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Report-Style Bar Graph Results Section -->
+        <div id="live-report-results-container" class="mt-4">
+            <h3 class="text-center mb-3">Live Vote Counts (Report View)</h3>
+            <!-- Report-style bar graphs will be displayed here -->
+            <p class="text-center">Loading report view...</p>
+        </div>
+
     </div>
 
-    <!-- Total Votes -->
-    <div class="col-12  mb-2">
-      <div class="summary-box" style="background-color: #0d1b2a; color: white;">
-        <h6>Total Votes</h6>
-        <h4 id="total-votes">--</h4>
-      </div>
-    </div>
-
-    <!-- Total Positions -->
-    <div class="col-12  mb-2">
-      <div class="summary-box" style="background-color: #0d1b2a; color: white;">
-        <h6>Total Positions</h6>
-        <h4 id="total-positions">--</h4>
-      </div>
-    </div>
-  </div>
-</div>
-
-<style>
-.summary-box {
-  padding: 15px;              /* Reduced padding */
-  border-radius: 10px;        /* Slightly smaller corners */
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-}
-.summary-box h6 {
-  font-size: 0.95rem;
-  margin-bottom: 5px;
-}
-.summary-box h4 {
-  font-size: 1.4rem;
-  margin: 0;
-}
-</style>
-
-
-  <div class="chart-container mb-6">
-    <canvas id="votesByPosition" height="100"></canvas>
-  </div>
-
-  <div class="chart-container mb-5">
-    <canvas id="votesByCandidate" height="100"></canvas>
-  </div>
-</div>
-<!-- Dashboard Section End -->
-
-<!-- Load Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <?php // include('footer.php'); // Uncomment if you use this ?>
+    <?php include('script.php'); // General scripts, ensure jQuery is loaded if not already by head.php ?>
 
 <script>
-function loadDashboard() {
-  fetch('real_timedata.php')
-    .then(res => res.json())
-    .then(data => {
-      const totalCandidates = data.length;
-      const totalVotes = data.reduce((sum, c) => sum + c.vote_count, 0);
-      const uniquePositions = [...new Set(data.map(c => c.position_name))];
+    const ADMIN_IMG_PATH = 'admin2/'; // Path to your admin images folder
 
-      document.getElementById("total-candidates").innerText = totalCandidates;
-      document.getElementById("total-votes").innerText = totalVotes;
-      document.getElementById("total-positions").innerText = uniquePositions.length;
+    function fetchLiveResults() {
+        fetch('real_timedata.php')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!Array.isArray(data)) {
+                    console.error('Data is not an array:', data);
+                    throw new Error('Received invalid data format from server.');
+                }
+                updateDashboardSummary(data);
+                displayTableResults(data); // Optional: if you keep the table view
+                displayReportStyleResults(data);
+            })
+            .catch(error => {
+                console.error('Error fetching live results:', error);
+                const errorMsg = '<p class="text-danger text-center">Error loading live results. Please try again later.</p>';
+                document.getElementById('live-table-results-container').innerHTML = errorMsg;
+                document.getElementById('live-report-results-container').innerHTML = errorMsg;
+            });
+    }
 
-      // Clear old charts if they exist
-      if (window.positionChart) window.positionChart.destroy();
-      if (window.candidateChart) window.candidateChart.destroy();
+    function updateDashboardSummary(results) {
+        const totalCandidates = results.length;
+        const totalVotes = results.reduce((sum, c) => sum + parseInt(c.vote_count, 10), 0);
+        const uniquePositions = [...new Set(results.map(c => c.position_name))];
 
-      // Votes by Position
-      const votesByPosition = {};
-      data.forEach(c => {
-        votesByPosition[c.position_name] = (votesByPosition[c.position_name] || 0) + c.vote_count;
-      });
+        document.getElementById("total-candidates").innerText = totalCandidates;
+        document.getElementById("total-votes").innerText = totalVotes;
+        document.getElementById("total-positions").innerText = uniquePositions.length;
+    }
 
-      const positionCtx = document.getElementById("votesByPosition").getContext("2d");
-      window.positionChart = new Chart(positionCtx, {
-        type: 'bar',
-        data: {
-          labels: Object.keys(votesByPosition),
-          datasets: [{
-            label: 'Votes per Position',
-            backgroundColor: '#1e88e5',
-            data: Object.values(votesByPosition)
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: { y: { beginAtZero: true } }
-        }
-      });
-
-      // Top Candidates
-      const topCandidates = [...data].sort((a, b) => b.vote_count - a.vote_count).slice(0, 10);
-      const candidateCtx = document.getElementById("votesByCandidate").getContext("2d");
-      window.candidateChart = new Chart(candidateCtx, {
-        type: 'bar',
-        data: {
-          labels: topCandidates.map(c => `${c.firstname} ${c.lastname}`),
-          datasets: [{
-            label: 'Top 10 Candidates',
-            backgroundColor: '#43a047',
-            data: topCandidates.map(c => c.vote_count)
-          }]
-        },
-        options: {
-          responsive: true,
-          indexAxis: 'y',
-          scales: { x: { beginAtZero: true } }
-        }
-      });
-    });
-}
-
-loadDashboard();
-setInterval(loadDashboard, 10000); // Update every 10 seconds
-</script>
-
-
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-function loadDashboardData() {
-  fetch('real_timedata.php')
-    .then(res => res.json())
-    .then(data => {
-      // 🧮 Stats
-      const totalCandidates = data.length;
-      const totalVotes = data.reduce((sum, c) => sum + c.vote_count, 0);
-      const positions = [...new Set(data.map(c => c.position_name))];
-
-      document.getElementById("total-candidates").innerText = totalCandidates;
-      document.getElementById("total-votes").innerText = totalVotes;
-      document.getElementById("total-positions").innerText = positions.length;
-
-      // 🎯 Top 10 Candidates
-      const top10 = [...data].sort((a, b) => b.vote_count - a.vote_count).slice(0, 10);
-      const candidateNames = top10.map(c => `${c.firstname} ${c.lastname}`);
-      const voteCounts = top10.map(c => c.vote_count);
-
-      // Destroy old chart if exists
-      if (window.topChart) window.topChart.destroy();
-
-      const ctx = document.getElementById("topCandidatesChart").getContext("2d");
-      window.topChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: candidateNames,
-          datasets: [{
-            label: 'Vote Count',
-            data: voteCounts,
-            backgroundColor: '#43a047'
-          }]
-        },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          scales: {
-            x: {
-              beginAtZero: true,
-              title: { display: true, text: 'Votes' }
-            },
-            y: {
-              title: { display: true, text: 'Candidate' }
+    // Optional: Function to display results in a table format
+    function displayTableResults(results) {
+        const groupedResults = {};
+        results.forEach(candidate => {
+            if (!groupedResults[candidate.position_name]) {
+                groupedResults[candidate.position_name] = [];
             }
-          },
-          plugins: {
-            legend: { display: false }
-          }
+            groupedResults[candidate.position_name].push(candidate);
+        });
+
+        let tableHTML = '';
+        for (const position in groupedResults) {
+            if (groupedResults.hasOwnProperty(position)) {
+                const candidates = groupedResults[position];
+                candidates.sort((a, b) => parseInt(b.vote_count, 10) - parseInt(a.vote_count, 10));
+
+                tableHTML += `<div class="mb-4" style="border: 1px solid rgba(30, 110, 157, 0.3); border-radius:10px; padding:15px;">
+                                <h3 class="position-title-table">${position}</h3>
+                                <table class="table table-striped table-bordered table-hover table-sm">
+                                    <thead class="thead-dark">
+                                        <tr><th>Rank</th><th>Candidate</th><th>Votes</th></tr>
+                                    </thead>
+                                    <tbody>`;
+                candidates.forEach((candidate, index) => {
+                    const leadingClass = index === 0 ? 'leading-candidate-table' : '';
+                    const imgSrc = candidate.img ? ADMIN_IMG_PATH + candidate.img : 'admin2/default_avatar.png'; // Fallback image
+                    tableHTML += `<tr class="${leadingClass}">
+                                    <td>${index + 1}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="${imgSrc}" alt="${candidate.firstname} ${candidate.lastname}" class="candidate-image-live">
+                                            <span>${candidate.firstname} ${candidate.lastname}</span>
+                                        </div>
+                                    </td>
+                                    <td>${candidate.vote_count}</td>
+                                  </tr>`;
+                });
+                tableHTML += `</tbody></table>`;
+                if (candidates.length > 0) {
+                    tableHTML += `<div class="text-center leading-candidate-table p-2">
+                                    <span>Current Leader: ${candidates[0].firstname} ${candidates[0].lastname}</span>
+                                  </div>`;
+                }
+                tableHTML += `</div>`;
+            }
         }
-      });
-    });
-}
+        document.getElementById('live-table-results-container').innerHTML = tableHTML || '<p class="text-center">No results to display in table view.</p>';
+    }
 
-loadDashboardData();
-setInterval(loadDashboardData, 10000); // Refresh every 10s
+
+    function displayReportStyleResults(results) {
+        const groupedResults = {};
+        results.forEach(candidate => {
+            if (!groupedResults[candidate.position_name]) {
+                groupedResults[candidate.position_name] = { candidates: [], total_votes: 0 };
+            }
+            const voteCount = parseInt(candidate.vote_count, 10);
+            groupedResults[candidate.position_name].candidates.push({...candidate, vote_count: voteCount});
+            groupedResults[candidate.position_name].total_votes += voteCount;
+        });
+
+        let reportHTML = '';
+        for (const positionName in groupedResults) {
+            if (groupedResults.hasOwnProperty(positionName)) {
+                const positionData = groupedResults[positionName];
+                const candidates = positionData.candidates;
+                const totalPositionVotes = positionData.total_votes;
+
+                candidates.sort((a, b) => b.vote_count - a.vote_count); // Sort by votes descending
+
+                reportHTML += `<div class="live-candidate-results">
+                                <h4 class="text-primary text-center">${positionName}</h4>`;
+
+                if (candidates.length === 0) {
+                    reportHTML += '<p class="text-center">No candidates or votes for this position yet.</p>';
+                } else {
+                    candidates.forEach((candidate, index) => {
+                        const percent = totalPositionVotes > 0 ? ((candidate.vote_count / totalPositionVotes) * 100).toFixed(2) : 0;
+                        const barColor = index === 0 ? '#d9534f' : '#5cb85c'; // Red for leader, green for others
+                        const imgSrc = candidate.img ? ADMIN_IMG_PATH + candidate.img : 'admin2/default_avatar.png'; // Fallback image
+
+                        reportHTML += `
+                            <div class="candidate-bar-container">
+                                <strong>${index + 1}. ${candidate.firstname} ${candidate.lastname}</strong>
+                                <span class="vote-details">${candidate.vote_count} votes | ${candidate.party || 'N/A'} | ${percent}%</span>
+                                <div class="progress-bar-custom">
+                                    <div class="progress-bar-fill" style="width:${percent}%; background-color:${barColor};"></div>
+                                    <img src="${imgSrc}" alt="${candidate.firstname}" class="candidate-avatar-on-bar" style="left: calc(${percent}% - 20px);">
+                                </div>
+                            </div>`;
+                    });
+                }
+                reportHTML += `</div>`; // Close live-candidate-results
+            }
+        }
+        document.getElementById('live-report-results-container').innerHTML = reportHTML || '<p class="text-center">No results to display in report view.</p>';
+    }
+
+    // Initial fetch
+    fetchLiveResults();
+
+    // Set interval for live updates (e.g., every 5-10 seconds)
+    setInterval(fetchLiveResults, 7000); // Update every 7 seconds
 </script>
-
-        
-    </div>
-
-    <?php include('footer.php'); ?>
-    <?php include('script.php'); ?>
+<?php include('footer.php'); ?>
+<?php include('script.php'); ?>
 </body>
-
+</html>
 <script>
     function fetchResults() {
         fetch('real_timedata.php')

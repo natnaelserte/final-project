@@ -14,11 +14,16 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
     $registration_data = $_SESSION['registration_data'];
     $phone = $_SESSION['phone_number'];
     $otp = $_SESSION['user_otp'];
-    $gender = $registration_data['gender'];
+
     $id_number = $registration_data['id_number'];
     $password = $registration_data['password']; // Already encrypted
-    $email = $registration_data['email']; // Get email from session
+    $gender = $registration_data['gender'];
+    $email = $registration_data['email'];
+    $department = $registration_data['department'];
+    $club_membership = $registration_data['club_membership'];
+    $is_class_representative = $registration_data['is_class_representative'];
     $date = date("Y-m-d H:i:s");
+    // $status = 'pending'; // Or 'active' depending on your workflow after OTP <-- REMOVED STATUS VARIABLE
 
     // Check OTP validity (not older than 1 hour)
     $valid_time = date('Y-m-d H:i:s', strtotime('-1 hour'));
@@ -60,8 +65,9 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
 
     // Insert new user
     try {
-        $insert_query = "INSERT INTO users (id_number, username, password, firstname, lastname, gender, phone, email, registration_date) 
-                         VALUES (:id_number, :username, :password, :firstname, :lastname, :gender, :phone, :email, :registration_date)";
+        // <-- MODIFIED: Removed 'status' from INSERT query and execute array
+        $insert_query = "INSERT INTO users (id_number, username, password, firstname, lastname, gender, phone, email, department, club_membership, is_class_representative, registration_date)
+                         VALUES (:id_number, :username, :password, :firstname, :lastname, :gender, :phone, :email, :department, :club_membership, :is_class_representative, :registration_date)";
         $stmt = $pdo->prepare($insert_query);
         $stmt->execute([
             ':id_number' => $id_number,
@@ -71,8 +77,12 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
             ':lastname' => $lastname,
             ':gender' => $gender,
             ':phone' => $phone,
-            ':email' => $email, // Add email to database insertion
+            ':email' => $email,
+            ':department' => $department,
+            ':club_membership' => $club_membership,
+            ':is_class_representative' => $is_class_representative,
             ':registration_date' => $date
+            // ':status' => $status // <-- REMOVED STATUS PARAMETER
         ]);
 
         // Clear session data after success
@@ -82,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
         exit();
     } catch (PDOException $e) {
         // Optionally: error_log($e->getMessage());
-        echo "<script>alert('Error saving user. Please try again.'); window.location='index.php';</script>";
+        echo "<script>alert('Error saving user. Please try again. Error: " . htmlspecialchars($e->getMessage()) . "'); window.location='index.php';</script>";
         exit();
     }
 

@@ -41,6 +41,9 @@
                         <a href="#"><i class="fa fa-menu fa-fw"></i>Menu </a>
                         </li>
                         <li>
+                            <a href="dashboard.php"><i class="fa fa-user fa-fw"></i> Dashboard</a>
+                        </li>
+                        <li>
                             <a href="candidate.php"><i class="fa fa-user fa-fw"></i> View Candidates</a>
                         </li>
                         <li>

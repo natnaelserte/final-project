@@ -1,38 +1,23 @@
 <?php
 session_start();
 
-// --- INCLUDE YOUR DATABASE CONNECTION FILE HERE ---
-// This line you already have. Make sure $pdo_conn (or your PDO variable) is defined by it.
 include('admin/dbcon.php');
-// If your dbcon.php uses a different variable name for the PDO object (e.g., $conn, $db),
-// you MUST replace $pdo_conn with that name in the database section below.
 
-
-// PHPMailer Use Statements
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-// Manually include PHPMailer files
 if (file_exists('PHPMailer-6.10.0/src/Exception.php')) require 'PHPMailer-6.10.0/src/Exception.php'; else die('Error: PHPMailer Exception.php not found.');
 if (file_exists('PHPMailer-6.10.0/src/PHPMailer.php')) require 'PHPMailer-6.10.0/src/PHPMailer.php'; else die('Error: PHPMailer PHPMailer.php not found.');
 if (file_exists('PHPMailer-6.10.0/src/SMTP.php')) require 'PHPMailer-6.10.0/src/SMTP.php'; else die('Error: PHPMailer SMTP.php not found.');
 
-// Include head.php safely
 if (file_exists('head.php')) {
     include('head.php');
-} else {
-    echo "<!-- head.php not found -->";
 }
 
-// Constants
-define('OTP_EXPIRY', 120); // 2 minutes
+define('OTP_EXPIRY', 120);
 
-// --- MODIFIED OTP GENERATION AND EMAIL SENDING LOGIC ---
 if (isset($_GET['resend']) && $_GET['resend'] === "true") {
-
-    // CRITICAL: Check if the PDO database connection variable is set and valid.
-    // *** REPLACE '$pdo_conn' WITH THE ACTUAL VARIABLE NAME FROM YOUR 'admin/dbcon.php' IF DIFFERENT ***
     if (!isset($pdo) || !($pdo instanceof PDO)) {
         $_SESSION['otp_message'] = "Error: Database connection is not available. Cannot fetch email.";
         $_SESSION['otp_message_type'] = 'danger';
@@ -41,7 +26,6 @@ if (isset($_GET['resend']) && $_GET['resend'] === "true") {
         exit();
     }
 
-    // Ensure username is in session (should be set during initial login)
     if (!isset($_SESSION['username'])) {
         $_SESSION['otp_message'] = "Error: User session not found. Please login again.";
         $_SESSION['otp_message_type'] = 'danger';
@@ -55,9 +39,7 @@ if (isset($_GET['resend']) && $_GET['resend'] === "true") {
     $user_email_to_send_otp = null;
 
     try {
-        // Fetch email from database based on username using PDO
-        // *** REPLACE '$pdo_conn' WITH THE ACTUAL VARIABLE NAME FROM YOUR 'admin/dbcon.php' IF DIFFERENT ***
-        $sql = "SELECT email FROM users WHERE username = :username LIMIT 1"; // Adjust table/column names if needed
+        $sql = "SELECT email FROM users WHERE username = :username LIMIT 1";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':username', $session_username, PDO::PARAM_STR);
         $stmt->execute();
@@ -76,7 +58,6 @@ if (isset($_GET['resend']) && $_GET['resend'] === "true") {
         error_log("OTP Resend PDO DB Error for username: " . $session_username . " - " . $e->getMessage());
     }
 
-
     if ($user_email_to_send_otp) {
         $_SESSION['otp'] = rand(100000, 999999);
         $_SESSION['otp_expire'] = time() + OTP_EXPIRY;
@@ -84,18 +65,14 @@ if (isset($_GET['resend']) && $_GET['resend'] === "true") {
 
         $mail = new PHPMailer(true);
         try {
-            // --- SERVER SETTINGS FOR MAILTRAP ---
-            $mail->SMTPDebug = SMTP::DEBUG_OFF; // Or you can use the number 4 for very verbose output // Change to SMTP::DEBUG_SERVER for detailed logs if needed
+            $mail->SMTPDebug = SMTP::DEBUG_OFF;
             $mail->isSMTP();
             $mail->Host       = 'sandbox.smtp.mailtrap.io';
             $mail->SMTPAuth   = true;
-            $mail->Username   = '2c6302b1d58448';                 // YOUR MAILTRAP USERNAME
-            $mail->Password   = '2a4edeb25107e1'; // <<<< REPLACE WITH YOUR FULL MAILTRAP PASSWORD (e.g., ********0485)
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;   // Use STARTTLS
-            $mail->Port       = 2525;                              // Port for STARTTLS
-
-            // Optional: Disable SSL verification for Mailtrap sandbox if you encounter SSL issues
-            // This is generally safe for Mailtrap's sandbox environment during testing.
+            $mail->Username   = '41ad075c726835';
+            $mail->Password   = '38c7d95eb94a24';
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 2525;
             
             $mail->SMTPOptions = array(
                 'ssl' => array(
@@ -105,10 +82,8 @@ if (isset($_GET['resend']) && $_GET['resend'] === "true") {
                 )
             );
             
-            // --- END MAILTRAP SERVER SETTINGS ---
-
             $mail->setFrom('otp-service@your-app.test', 'Your Voting App (Test)');
-            $mail->addAddress($user_email_to_send_otp, 'Test User'); // OTP is sent "to" this user, caught by Mailtrap
+            $mail->addAddress($user_email_to_send_otp, 'Test User');
 
             $mail->isHTML(true);
             $mail->Subject = '[TEST OTP] Your Verification Code - Voting App';
@@ -132,49 +107,150 @@ if (isset($_GET['resend']) && $_GET['resend'] === "true") {
     exit();
 }
 ?>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+<style>
+    body {
+        background-color: #f7f7f7; 
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; 
+        font-family: Arial, sans-serif; 
+    }
+    .otp-container-custom { 
+        margin-top: 30px;   
+        margin-bottom: 50px;
+        max-width: 530px; 
+        padding-left: 15px;
+        padding-right: 15px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .otp-form-wrapper { 
+        background: #f7f7f7; 
+        padding: 30px 15px; 
+        border-radius: 8px;
+        text-align: center; 
+    }
+    .otp-box { 
+        background: #fff;
+        border-radius: 6px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        padding: 30px;
+        margin-top: 20px; 
+    }
+    .otp-box h4 {
+        text-align: center;
+        margin-bottom: 15px; 
+        font-size: 22px; 
+        font-weight: 600;
+    }
+    .form-group { 
+        margin-bottom: 20px;
+    }
+    .form-control { 
+        height: 45px; 
+        border-radius: 4px;
+    }
+    .btn-primary-custom { 
+        background-color: #337ab7; 
+        border-color: #2e6da4;
+        color: white;
+        padding: 10px 15px;
+        font-size: 16px;
+        line-height: 1.5;
+        border-radius: 4px;
+        width: 100%; 
+        font-weight: bold;
+    }
+    .btn-primary-custom:hover {
+        background-color: #286090;
+        border-color: #204d74;
+    }
+    .btn-warning-custom { 
+        background-color: #f0ad4e;
+        border-color: #eea236;
+        color: white;
+    }
+    .btn-warning-custom:hover {
+        background-color: #ec971f;
+        border-color: #d58512;
+    }
+    .alert-custom-otp {
+        margin-top: 10px;
+        margin-bottom: 20px;
+        padding: 10px 15px;
+        border-radius: 4px;
+    }
+    .input-group-otp { 
+        display: flex;
+        gap: 10px;
+        align-items: center; 
+    }
+    .input-group-otp .form-control {
+        flex: 1; 
+    }
+    .text-muted-otp {
+        color: #777;
+        margin-bottom: 25px;
+        font-size: 16px;
+    }
+     footer { 
+        margin-top: auto;
+        padding: 20px;
+        background-color: #f8f9fa; 
+        width: 100%;
+        text-align: center;
+    }
+</style>
 
 <body>
 <?php
-if (file_exists('view_banner.php')) include('view_banner.php'); else echo "<!-- view_banner.php not found -->";
+if (file_exists('view_banner.php')) include('view_banner.php');
 ?>
-<div class="content">
-    <div class="container_1">
-        <div class="form-panel">
-            <div class="form-heading">Email OTP Verification (Mailtrap Test)</div>
 
+<div class="otp-container-custom">
+    <div class="otp-form-wrapper">
+        <h2 class="text-center">Two-Factor Authentication</h2> 
+        <p class="text-center text-muted-otp">Please verify your account by entering the OTP sent to your email (via Mailtrap).</p>
+
+        <div class="otp-box">
+            <h4>Verify your Account</h4>
+            
             <?php
             if (isset($_SESSION['otp_message'])) {
                 $message_type = isset($_SESSION['otp_message_type']) ? $_SESSION['otp_message_type'] : 'info';
-                $alert_class = ($message_type === 'danger') ? 'alert-danger' : 'alert-success';
-                echo '<div style="padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;" class="' . htmlspecialchars($alert_class) . '">' . htmlspecialchars($_SESSION['otp_message']) . '</div>';
+                $alert_class = ($message_type === 'danger') ? 'alert-danger' : (($message_type === 'success') ? 'alert-success' : 'alert-info');
+                echo '<div class="alert ' . htmlspecialchars($alert_class) . ' alert-custom-otp" role="alert">' . htmlspecialchars($_SESSION['otp_message']) . '</div>';
                 unset($_SESSION['otp_message'], $_SESSION['otp_message_type']);
             }
             ?>
 
             <form role="form" method="post" class="index-form" action="otp_form.php">
-                <div class="form-field">
-                    <label for="otp_input_id">Enter OTP (from Mailtrap):</label>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <input type="text" id="otp_input_id" name="otp_input" class="form-control" placeholder="Enter 6-digit OTP" required pattern="\d{6}" title="OTP must be 6 digits" style="flex: 1;">
-                        <button type="button" id="getCodeBtn" class="btn btn-warning">
+                <div class="form-group">
+                    <div class="input-group-otp"> 
+                        <input type="text" id="otp_input_id" name="otp_input" class="form-control" placeholder="Enter OTP" required pattern="\d{6}" title="OTP must be 6 digits">
+                        <button type="button" id="getCodeBtn" class="btn btn-warning-custom"> 
                             <?php
                                 if (isset($_SESSION['otp']) && isset($_SESSION['otp_expire']) && time() < $_SESSION['otp_expire']) {
-                                    echo 'Resend OTP to Mailtrap';
+                                    echo 'Resend OTP';
                                 } else {
-                                    echo 'Get OTP via Mailtrap';
+                                    echo 'Get OTP';
                                 }
                             ?>
                         </button>
                     </div>
                 </div>
-                <div id="timer" style="text-align:center; margin-top:10px; font-weight: bold;"></div>
-                <center>
-                    <button type="submit" class="btn btn-lg btn-success btn-block" name="login">Verify & Login</button>
-                </center>
+
+                <div id="timer" style="text-align:center; margin-bottom:15px; margin-top: -10px; font-weight: bold; color: #555;"></div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary-custom" name="login">Verify</button> 
+                </div>
             </form>
 
             <?php
-            // OTP Verification Logic (Backend - Unchanged as requested)
             $otp_submit_button_name = 'login';
             if (isset($_POST[$otp_submit_button_name])) {
                 if (!isset($_SESSION['user_id'])) {
@@ -184,7 +260,7 @@ if (file_exists('view_banner.php')) include('view_banner.php'); else echo "<!-- 
                 }
                 $user_otp = isset($_POST['otp_input']) ? trim($_POST['otp_input']) : '';
                 if (!isset($_SESSION['otp']) || !isset($_SESSION['otp_expire'])) {
-                    $_SESSION['otp_message'] = 'No OTP found in session. Please request a new one.';
+                    $_SESSION['otp_message'] = 'incorrect otp. Please request a new one.';
                     $_SESSION['otp_message_type'] = 'danger';
                     echo "<script type='text/javascript'>window.location.href = 'otp_form.php';</script>";
                     exit();
@@ -201,12 +277,20 @@ if (file_exists('view_banner.php')) include('view_banner.php'); else echo "<!-- 
                     if (isset($_SESSION['user_role'])) {
                         $role_id = $_SESSION['user_role'];
                         $redirect_url = '';
-                        if ($role_id == 1) $redirect_url = 'admin/index.php';
-                        elseif ($role_id == 2) $redirect_url = 'admin2/index.php';
-                        elseif ($role_id == 3) $redirect_url = 'voter_home.php';
-                        else {
+                        if ($role_id == 1 || $role_id == 4) { // Check for role_id 1 OR 4
+                            $redirect_url = 'admin/index.php';
+                        } elseif ($role_id == 2) {
+                            $redirect_url = 'admin2/index.php';
+                        } elseif ($role_id == 3) {
+                            $redirect_url = 'voter_home.php';
+                        } else {
+                            // This 'else' block will now only be reached if role_id is NOT 1, 4, 2, or 3.
                             error_log("OTP Verified: Unknown role_id '{$role_id}' for user_id '{$_SESSION['user_id']}'.");
-                            if (session_status() == PHP_SESSION_NONE) { session_start(); }
+                            // It's generally better to have session_start() at the very beginning of your script.
+                            // However, keeping your original structure for this specific change:
+                            if (session_status() == PHP_SESSION_NONE) {
+                                session_start();
+                            }
                             $_SESSION['login_message'] = 'Login successful, but your user role is unrecognized. Please contact support.';
                             echo "<script type='text/javascript'>window.location='login.php';</script>";
                             exit();
@@ -228,9 +312,9 @@ if (file_exists('view_banner.php')) include('view_banner.php'); else echo "<!-- 
                 }
             }
             ?>
-        </div>
-    </div>
-</div>
+        </div> 
+    </div> 
+</div> 
 
 <script type="text/javascript">
     const getCodeBtn = document.getElementById("getCodeBtn");
@@ -238,12 +322,12 @@ if (file_exists('view_banner.php')) include('view_banner.php'); else echo "<!-- 
     let intervalId;
     function startTimer(duration) {
         let countdown = duration;
-        if (getCodeBtn) { getCodeBtn.disabled = true; /* getCodeBtn.innerText = "Resend OTP to Mailtrap"; */ } // Text already set by PHP
+        if (getCodeBtn) { getCodeBtn.disabled = true; } 
         function updateTimerDisplay() {
             if (countdown <= 0) {
                 clearInterval(intervalId);
                 if (timerElement) timerElement.innerText = "OTP expired. Please request a new one.";
-                if (getCodeBtn) { getCodeBtn.innerText = "Get OTP via Mailtrap"; getCodeBtn.disabled = false; }
+                if (getCodeBtn) { getCodeBtn.innerText = "Get OTP"; getCodeBtn.disabled = false; }
             } else {
                 const mins = Math.floor(countdown / 60);
                 const secs = countdown % 60;
@@ -259,8 +343,7 @@ if (file_exists('view_banner.php')) include('view_banner.php'); else echo "<!-- 
         $remainingTime = $_SESSION['otp_expire'] - time();
         echo "startTimer(" . $remainingTime . ");\n";
     } else {
-        echo 'if (timerElement) timerElement.innerText = "Click button to get OTP (via Mailtrap).";';
-        // getCodeBtn text is set by PHP based on session state
+        echo 'if (timerElement) timerElement.innerText = "Click button to get OTP.";';
     }
     ?>
     if (getCodeBtn) {
@@ -272,8 +355,8 @@ if (file_exists('view_banner.php')) include('view_banner.php'); else echo "<!-- 
 </script>
 
 <?php
-if (file_exists('footer.php')) include('footer.php'); else echo "<!-- footer.php not found -->";
-if (file_exists('script.php')) include('script.php'); else echo "<!-- script.php not found -->";
+if (file_exists('footer.php')) include('footer.php');
+if (file_exists('script.php')) include('script.php');
 ?>
 </body>
 </html>

@@ -1,0 +1,287 @@
+/* style_activate.css */
+
+:root {
+    --primary-color: #007bff; /* Standard blue for primary actions */
+    --primary-hover-color: #0056b3;
+    --secondary-color: #28a745; /* Green for "all" or secondary positive action */
+    --secondary-hover-color: #1e7e34;
+    --light-gray-color: #f8f9fa;
+    --medium-gray-color: #e9ecef;
+    --dark-gray-color: #6c757d;
+    --text-color: #343a40;
+    --border-color: #ced4da;
+    --success-bg: #d4edda;
+    --success-text: #155724;
+    --success-border: #c3e6cb;
+    --error-bg: #f8d7da;
+    --error-text: #721c24;
+    --error-border: #f5c6cb;
+    --white-color: #ffffff;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --border-radius: 8px;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0px; /* Add some padding for small screens so container doesn't touch edge */
+    background-color: var(--light-gray-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    min-height: 100vh; /* Ensure body takes at least full viewport height */
+    box-sizing: border-box;
+}
+
+.container {
+    max-width: 650px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: var(--white-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+h2 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-top: 0; /* Remove default top margin if it's the first element in container */
+    margin-bottom: 25px;
+    font-weight: 500;
+    border-bottom: 1px solid var(--medium-gray-color);
+    padding-bottom: 15px;
+    font-size: 1.75em; /* Default size */
+}
+
+p.instructions {
+    text-align: center;
+    margin-bottom: 25px;
+    color: var(--dark-gray-color);
+    font-size: 0.95em;
+}
+
+label { 
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+select,
+input[type="submit"],
+button[type="button"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    box-sizing: border-box;
+    font-size: 1em;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+select:focus,
+input[type="submit"]:focus,
+button[type="button"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+select {
+    background-color: var(--white-color);
+    appearance: none;
+    -webkit-appearance: none; /* For Safari */
+    -moz-appearance: none; /* For Firefox */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007bff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
+    padding-right: 40px;
+}
+
+input[type="submit"],
+button[type="button"] {
+    color: var(--white-color);
+    cursor: pointer;
+    font-weight: 500;
+    border: none;
+}
+
+input[type="submit"] {
+    background-color: var(--primary-color);
+}
+input[type="submit"]:hover {
+    background-color: var(--primary-hover-color);
+}
+
+button.activate-all {
+    background-color: var(--secondary-color);
+}
+button.activate-all:hover {
+    background-color: var(--secondary-hover-color);
+}
+
+.message {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    font-size: 0.95em;
+}
+.message.error {
+    background-color: var(--error-bg);
+    color: var(--error-text);
+    border: 1px solid var(--error-border);
+}
+.message.success {
+    background-color: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
+}
+
+.form-group {
+    margin-bottom: 25px;
+    padding: 20px;
+    border: 1px solid var(--medium-gray-color);
+    border-radius: var(--border-radius);
+    background-color: var(--light-gray-color);
+}
+.form-group legend {
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+    font-size: 1.1em;
+    padding: 0 5px; /* Ensure legend text doesn't touch border if it wraps */
+    width: auto; /* Allow legend to size based on content */
+}
+.form-group label { /* Radio button labels */
+    display: inline-flex; 
+    align-items: center; 
+    margin-right: 20px;
+    font-weight: 400; 
+    color: var(--text-color);
+    cursor: pointer;
+    margin-bottom: 10px; /* Add some bottom margin for wrapping cases */
+}
+.form-group label:last-of-type {
+    margin-right: 0; /* Remove margin from last label in group */
+}
+.form-group input[type="radio"] {
+    width: auto;
+    margin-right: 8px;
+    transform: scale(1.1); 
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), var(--border-color), rgba(0, 0, 0, 0));
+    margin: 35px 0;
+}
+
+
+/* --- Responsive Adjustments --- */
+
+/* For Tablets and larger mobile phones */
+@media (max-width: 768px) {
+    body {
+        padding: 15px; /* Slightly reduce body padding */
+    }
+    .container {
+        margin: 20px auto; /* Reduce top/bottom margin */
+        padding: 25px; /* Reduce container padding */
+        max-width: 95%; /* Allow container to be wider relative to viewport */
+    }
+
+    h2 {
+        font-size: 1.5em; /* Slightly smaller heading */
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+    }
+
+    select,
+    input[type="submit"],
+    button[type="button"] {
+        padding: 10px 12px; /* Slightly smaller padding for form elements */
+        font-size: 0.95em;
+    }
+
+    .form-group {
+        padding: 15px; /* Reduce form group padding */
+    }
+    
+    .form-group legend {
+        font-size: 1em;
+    }
+
+    /* Radio buttons might still fit side-by-side here, but ensure they wrap if not */
+    .form-group label {
+        margin-bottom: 10px; /* Ensure space if they wrap */
+    }
+}
+
+/* For smaller mobile phones */
+@media (max-width: 576px) {
+    body {
+        padding: 10px; /* Minimal body padding */
+    }
+    .container {
+        /* Further reduce container padding */
+        width: 100%; /* Container takes full width within body padding */
+        max-width: 100%;
+        box-shadow: none; /* Optional: remove shadow on very small screens */
+        border-radius: 0; /* Optional: full width, no radius */
+    }
+    /* Or if you want to keep some border/shadow for the container */
+    /*
+    .container {
+        margin: 15px 2.5%;
+        width: 95%;
+        max-width: 95%;
+        padding: 15px;
+    }
+    */
+    @media (max-width: 700px) {
+    .container {
+        max-width: 400px;
+    }}
+    h2 {
+        font-size: 1.3em; /* Smaller heading for mobile */
+        margin-bottom: 15px;
+    }
+
+    p.instructions {
+        font-size: 0.9em;
+        margin-bottom: 20px;
+    }
+
+    select,
+    input[type="submit"],
+    button[type="button"] {
+        padding: 12px 10px; /* Ensure good tap height */
+        font-size: 0.9em;
+        margin-bottom: 15px;
+    }
+
+    .form-group legend {
+        font-size: 0.95em;
+    }
+
+    .form-group label { /* Stack radio buttons */
+        display: block; /* Each radio label on its own line */
+        width: 100%;    /* Take full width */
+        margin-right: 0;
+        margin-bottom: 12px; /* Space between stacked radio options */
+    }
+    .form-group label:last-of-type {
+        margin-bottom: 0; /* No bottom margin for the last radio item */
+    }
+
+    .form-group input[type="radio"] {
+        transform: scale(1); /* Default size might be better on small screens */
+    }
+
+    hr {
+        margin: 25px 0;
+    }
+}

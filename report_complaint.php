@@ -1,77 +1,92 @@
 <?php
 session_start();
-include('admin/dbcon.php'); // Ensure dbcon.php is updated for PDO
-include('head.php');
+include('admin/dbcon.php'); // Ensure dbcon.php is updated for PDO and accessible
+include('head.php'); // Assuming head.php contains common head elements like meta tags, but not full HTML structure
 
 $errors = [];
 $success_message = "";
-$username_from_session = $_SESSION['username'] ?? '';
+$username_from_session = $_SESSION['username'] ?? ''; // Used to prefill username if available
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_complaint'])) {
+    // Sanitize and validate inputs
     $complainant_type = filter_input(INPUT_POST, 'complainant_type', FILTER_SANITIZE_STRING);
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
-    $voting_event_id = filter_input(INPUT_POST, 'voting_event_id', FILTER_VALIDATE_INT);
+    $voting_event_name = filter_input(INPUT_POST, 'voting_event_name', FILTER_SANITIZE_STRING); // Event name as text
     $complaint_category = filter_input(INPUT_POST, 'complaint_category', FILTER_SANITIZE_STRING);
     $complaint_subject = filter_input(INPUT_POST, 'complaint_subject', FILTER_SANITIZE_STRING);
     $complaint_details = filter_input(INPUT_POST, 'complaint_details', FILTER_SANITIZE_STRING);
 
-    if (empty($complainant_type)) $errors[] = "Please select your role.";
+    // Basic validation
+    if (empty($complainant_type)) $errors[] = "Please enter your role (e.g., Voter, Candidate).";
     if (empty($username)) $errors[] = "Please enter your username.";
-    if (empty($complaint_category)) $errors[] = "Please select a complaint category.";
-    if (empty($complaint_subject)) $errors[] = "Please provide a subject.";
-    if (empty($complaint_details)) $errors[] = "Please provide complaint details.";
+    if (empty($voting_event_name)) $errors[] = "Please enter the Voting Event name.";
+    if (empty($complaint_category)) $errors[] = "Please enter a complaint category (e.g., Fraud, Mismanagement).";
+    if (empty($complaint_subject)) $errors[] = "Please provide a subject for your complaint.";
+    if (empty($complaint_details)) $errors[] = "Please provide the details of your complaint.";
 
-    try {
-        // Insert complaint using a subquery to get the user ID directly
-        $stmt = $pdo->prepare("INSERT INTO report_complaints (username, voting_event_id, category, subject, description, created_at) 
-            VALUES ((SELECT id_number FROM users WHERE username = :username LIMIT 1), :voting_event_id, :category, :subject, :description, NOW())");
-    
-        $stmt->bindParam(':username', $username);
-        $stmt->bindParam(':voting_event_id', $voting_event_id, PDO::PARAM_INT);
-        $stmt->bindParam(':category', $complaint_category);
-        $stmt->bindParam(':subject', $complaint_subject);
-        $stmt->bindParam(':description', $complaint_details);
-    
-        if ($stmt->execute()) {
-            $complaint_id = $pdo->lastInsertId();
-            $success_message = "Complaint submitted successfully! Your Complaint ID is: COMP-$complaint_id";
-            $_POST = []; // Clear form
-        } else {
-            $errors[] = "Error submitting complaint.";
+    // If no errors, proceed to insert
+    if (empty($errors)) {
+        try {
+            // IMPORTANT: Assumes 'voting_event_id' column in 'report_complaints'
+            // is now VARCHAR or TEXT to store the event name.
+            $stmt = $pdo->prepare("INSERT INTO report_complaints (username, voting_event_id, category, subject, description, created_at) 
+                VALUES ((SELECT id_number FROM users WHERE username = :username LIMIT 1), :voting_event_name, :category, :subject, :description, NOW())");
+        
+            $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+            $stmt->bindParam(':voting_event_name', $voting_event_name, PDO::PARAM_STR); // Bind event name as string
+            $stmt->bindParam(':category', $complaint_category, PDO::PARAM_STR);
+            $stmt->bindParam(':subject', $complaint_subject, PDO::PARAM_STR);
+            $stmt->bindParam(':description', $complaint_details, PDO::PARAM_STR);
+        
+            if ($stmt->execute()) {
+                $complaint_id = $pdo->lastInsertId();
+                $success_message = "Complaint submitted successfully! Your Complaint ID is: COMP-" . htmlspecialchars($complaint_id);
+                // Clear $_POST to prevent re-submission and clear form fields
+                $_POST = []; 
+            } else {
+                $errors[] = "Error submitting complaint. Please try again.";
+            }
+        } catch (PDOException $e) {
+            // Log the detailed error for administrators
+            error_log("Complaint submission database error: " . $e->getMessage());
+            // Show a generic error to the user
+            $errors[] = "A database error occurred while submitting your complaint. Please try again later.";
         }
-    } catch (PDOException $e) {
-        $errors[] = "Database error: " . $e->getMessage();
     }
-    
 }
-$voting_events = [
-    ['id' => 1, 'title' => 'Community Hall Renovation Vote 2024'],
-    ['id' => 2, 'title' => 'Leadership Election 2024'],
+
+// Example list of current voting events for user guidance.
+// In a real application, you might fetch these from a database if you have a list of active events.
+$current_voting_events_examples = [
+    'class representative Election',
+    'Faculty Representative Election ',
+    'infoken leader election',
 ];
 
-// Get user status for sidebar menu
-$id_number = $_SESSION['username'] ?? null;
+// Get user status for sidebar menu logic
+$id_number_for_status_check = $_SESSION['username'] ?? null; // Using session username to check status
 $can_vote = false;
 
-if ($id_number) {
+if ($id_number_for_status_check) {
     try {
-        $stmt = $pdo->prepare("SELECT status, account FROM users WHERE username = :id_number");
-        $stmt->bindParam(':id_number', $id_number, PDO::PARAM_STR);
-        $stmt->execute();
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Assuming 'username' is the column in 'users' table that matches $_SESSION['username']
+        $stmt_user_status = $pdo->prepare("SELECT status, account FROM users WHERE username = :username_session_val");
+        $stmt_user_status->bindParam(':username_session_val', $id_number_for_status_check, PDO::PARAM_STR);
+        $stmt_user_status->execute();
+        $user_status_data = $stmt_user_status->fetch(PDO::FETCH_ASSOC);
 
-        // Normalize to lowercase for consistency
-        $status = trim($user['status'] ?? '');
-        $account = trim($user['account'] ?? '');
-
-        // Logic without strtolower
-        $can_vote = ($status === 'Unvoted' && $account === 'Active');
+        if ($user_status_data) {
+            $status = trim($user_status_data['status'] ?? '');
+            $account = trim($user_status_data['account'] ?? '');
+            // Check if user is eligible to vote
+            $can_vote = (strtolower($status) === 'unvoted' && strtolower($account) === 'active');
+        }
     } catch (PDOException $e) {
-        // Silently handle error
+        // Silently log error, don't break page for this
+        error_log("Error fetching user status for sidebar: " . $e->getMessage());
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -84,7 +99,7 @@ if ($id_number) {
     <link href="admin2/bootstrap-3.3.7/dist/css/bootstrap-theme.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <!-- Custom CSS -->
+    <!-- Custom CSS for SB Admin 2 -->
     <link href="admin2/css/sb-admin-2.css" rel="stylesheet">
     
     <style>
@@ -103,23 +118,29 @@ if ($id_number) {
         
         /* Form styling */
         .form-step-title {
-            font-size: 1.25rem;
+            font-size: 1.25rem; /* 20px */
             font-weight: 600;
-            color: #343a40;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid #0a3d62;
-            padding-bottom: 0.5rem;
+            color: #343a40; /* Dark gray */
+            margin-bottom: 1rem; /* 16px */
+            border-bottom: 2px solid #0a3d62; /* Dark blue border */
+            padding-bottom: 0.5rem; /* 8px */
         }
         
         .btn-submit {
-            background-color: #0a3d62;
+            background-color: #0a3d62; /* Dark blue */
             color: #fff;
             font-weight: 500;
+            padding: 10px 20px;
+            font-size: 1rem; /* 16px */
         }
         
         .btn-submit:hover {
-            background-color: #0c2461;
+            background-color: #0c2461; /* Darker blue */
             color: #fff;
+        }
+        .help-block {
+            font-size: 0.875rem; /* 14px */
+            color: #777;
         }
     </style>
 </head>
@@ -136,7 +157,7 @@ if ($id_number) {
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="voter_home.php">
                 <i class="fa fa-home"></i> Voter Portal
             </a>
         </div>
@@ -144,7 +165,7 @@ if ($id_number) {
         <ul class="nav navbar-top-links navbar-right">
             <li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i>Welcome: <?= htmlspecialchars($id_number) ?></i>
+                    <i>Welcome: <?= htmlspecialchars($username_from_session) ?></i>
                     <i class="fa fa-caret-down"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-user">
@@ -165,14 +186,14 @@ if ($id_number) {
                         <?php if ($can_vote): ?>
                             <a href="vote.php"><i class="fa fa-check-circle fa-fw"></i> Vote Now</a>
                         <?php else: ?>
-                            <a href="#" class="disabled"><i class="fa fa-times-circle fa-fw"></i> Vote (Not Eligible)</a>
+                            <a href="#" class="disabled" onclick="showNotEligibleMessage(); return false;"><i class="fa fa-times-circle fa-fw"></i> Vote (Not Eligible)</a>
                         <?php endif; ?>
                     </li>
                     <li class="active">
                         <a href="report_complaint.php"><i class="fa fa-comment fa-fw"></i> Report Complaint</a>
                     </li>
                     <li>
-                        <a href="voter_home.php#complaintsSection"><i class="fa fa-list fa-fw"></i> View Complaints</a>
+                        <a href="voter_home.php#complaintsSection"><i class="fa fa-list fa-fw"></i> View My Complaints</a>
                     </li>
                     <li>
                         <a href="update_password.php"><i class="fa fa-key fa-fw"></i> Change Password</a>
@@ -190,7 +211,7 @@ if ($id_number) {
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
-                    <h2 class="page-header">Report a Voting Complaint</h2>
+                    <h2 class="page-header"><i class="fa fa-bullhorn"></i> Report a Voting Complaint</h2>
                 </div>
             </div>
 
@@ -199,7 +220,7 @@ if ($id_number) {
                     <?php if (!empty($errors)): ?>
                         <div class="alert alert-danger">
                             <strong>Please correct the following errors:</strong>
-                            <ul class="mb-0">
+                            <ul style="margin-bottom: 0;">
                                 <?php foreach ($errors as $error): ?>
                                     <li><?= htmlspecialchars($error) ?></li>
                                 <?php endforeach; ?>
@@ -209,72 +230,76 @@ if ($id_number) {
 
                     <?php if ($success_message): ?>
                         <div class="alert alert-success"><?= htmlspecialchars($success_message) ?></div>
+                        <p><a href="voter_home.php#complaintsSection" class="btn btn-info">View My Complaints</a> 
+                           <a href="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>" class="btn btn-default">Submit Another Complaint</a></p>
                     <?php endif; ?>
 
-                    <?php if (!$success_message): ?>
+                    <?php if (!$success_message): // Only show form if no success message ?>
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title"><i class="fa fa-edit fa-fw"></i> Complaint Form</h3>
                         </div>
                         <div class="panel-body">
-                            <form method="POST" action="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data">
-                                <!-- Step 1 -->
+                            <form method="POST" action="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                                
+                                <div class="form-step-title"><i class="fa fa-user-tag"></i> Step 1: Identify Yourself</div>
                                 <div class="form-group">
-                                    <div class="form-step-title"><i class="fa fa-user-tag me-2"></i>Step 1: Identify Yourself</div>
-                                    <div class="form-group">
-                                        <label for="complainant_type" class="control-label">I am a:</label>
-                                        <select class="form-control" name="complainant_type" required>
-                                            <option value="">-- Select Your Role --</option>
-                                            <option value="voter" <?= @$_POST['complainant_type'] === 'voter' ? 'selected' : '' ?>>Voter</option>
-                                            <option value="candidate" <?= @$_POST['complainant_type'] === 'candidate' ? 'selected' : '' ?>>Candidate</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label">Username:</label>
-                                        <input type="text" name="username" class="form-control" value="<?= htmlspecialchars($_POST['username'] ?? $username_from_session) ?>" required>
-                                    </div>
+                                    <label for="complainant_type" class="control-label">I am a:</label>
+                                    <input type="text" class="form-control" name="complainant_type" id="complainant_type"
+                                           value="<?= htmlspecialchars($_POST['complainant_type'] ?? '') ?>" 
+                                           placeholder="Enter your role (e.g., Voter, Candidate, Observer)" required>
                                 </div>
-
-                                <!-- Step 2 -->
                                 <div class="form-group">
-                                    <div class="form-step-title"><i class="fa fa-calendar-check me-2"></i>Step 2: Voting Event</div>
-                                    <div class="form-group">
-                                        <label class="control-label">Select Voting Event:</label>
-                                        <select class="form-control" name="voting_event_id" required>
-                                            <option value="">-- Select Event --</option>
-                                            <?php foreach ($voting_events as $event): ?>
-                                                <option value="<?= $event['id'] ?>" <?= @$_POST['voting_event_id'] == $event['id'] ? 'selected' : '' ?>>
-                                                    <?= htmlspecialchars($event['title']) ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
+                                    <label for="username" class="control-label">Username:</label>
+                                    <input type="text" name="username" id="username" class="form-control" 
+                                           value="<?= htmlspecialchars($_POST['username'] ?? $username_from_session) ?>" 
+                                           placeholder="Your registered username" required>
                                 </div>
+                                <hr>
 
-                                <!-- Step 3 -->
+                                <div class="form-step-title"><i class="fa fa-calendar-check"></i> Step 2: Voting Event</div>
                                 <div class="form-group">
-                                    <div class="form-step-title"><i class="fa fa-file-alt me-2"></i>Step 3: Complaint Details</div>
-                                    <div class="form-group">
-                                        <label class="control-label">Complaint Category:</label>
-                                        <select class="form-control" name="complaint_category" required>
-                                            <option value="">-- Select Category --</option>
-                                            <option value="Fraud" <?= @$_POST['complaint_category'] === 'Fraud' ? 'selected' : '' ?>>Fraud</option>
-                                            <option value="Mismanagement" <?= @$_POST['complaint_category'] === 'Mismanagement' ? 'selected' : '' ?>>Mismanagement</option>
-                                            <option value="Intimidation" <?= @$_POST['complaint_category'] === 'Intimidation' ? 'selected' : '' ?>>Intimidation</option>
-                                            <option value="Other" <?= @$_POST['complaint_category'] === 'Other' ? 'selected' : '' ?>>Other</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label">Subject:</label>
-                                        <input type="text" name="complaint_subject" class="form-control" value="<?= htmlspecialchars($_POST['complaint_subject'] ?? '') ?>" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label">Complaint Details:</label>
-                                        <textarea name="complaint_details" class="form-control" rows="5" required><?= htmlspecialchars($_POST['complaint_details'] ?? '') ?></textarea>
-                                    </div>
+                                    <label for="voting_event_name" class="control-label">Name of the Voting Event:</label>
+                                    <input type="text" class="form-control" name="voting_event_name" id="voting_event_name"
+                                           value="<?= htmlspecialchars($_POST['voting_event_name'] ?? '') ?>" 
+                                           placeholder="Enter the official name of the voting event" required>
+                                    <?php if (!empty($current_voting_events_examples)): ?>
+                                    <small class="help-block">
+                                        For example: 
+                                        <?php 
+                                        $examples_output = [];
+                                        foreach ($current_voting_events_examples as $event_example) {
+                                            $examples_output[] = htmlspecialchars($event_example);
+                                        }
+                                        echo implode(', ', $examples_output);
+                                        ?>
+                                    </small>
+                                    <?php endif; ?>
                                 </div>
+                                <hr>
 
-                                <div class="text-center">
+                                <div class="form-step-title"><i class="fa fa-file-alt"></i> Step 3: Complaint Details</div>
+                                <div class="form-group">
+                                    <label for="complaint_category" class="control-label">Complaint Category:</label>
+                                    <input type="text" class="form-control" name="complaint_category" id="complaint_category"
+                                           value="<?= htmlspecialchars($_POST['complaint_category'] ?? '') ?>" 
+                                           placeholder="e.g., Voter Intimidation, Ballot Tampering, Misinformation, Access Issue, Other" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="complaint_subject" class="control-label">Subject of Complaint:</label>
+                                    <input type="text" name="complaint_subject" id="complaint_subject" class="form-control" 
+                                           value="<?= htmlspecialchars($_POST['complaint_subject'] ?? '') ?>" 
+                                           placeholder="A brief title for your complaint" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="complaint_details" class="control-label">Detailed Description of Complaint:</label>
+                                    <textarea name="complaint_details" id="complaint_details" class="form-control" rows="6" 
+                                              placeholder="Please provide as much detail as possible, including dates, times, locations, and names of individuals involved if known." 
+                                              required><?= htmlspecialchars($_POST['complaint_details'] ?? '') ?></textarea>
+                                </div>
+                                <hr>
+                                
+                                <div class="text-center" style="margin-top: 20px;">
                                     <button type="submit" name="submit_complaint" class="btn btn-primary btn-submit">
                                         <i class="fa fa-paper-plane"></i> Submit Complaint
                                     </button>
@@ -282,24 +307,24 @@ if ($id_number) {
                             </form>
                         </div>
                     </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                    <?php endif; // End of if(!$success_message) ?>
+                </div> <!-- /.col-md-10 -->
+            </div> <!-- /.row -->
+        </div> <!-- /.container-fluid -->
+    </div> <!-- /#page-wrapper -->
+</div> <!-- /#wrapper -->
 
 <!-- jQuery and Bootstrap JS -->
 <script src="admin2/js/jquery.js"></script>
 <script src="admin2/bootstrap-3.3.7/dist/js/bootstrap.min.js"></script>
 <!-- Metis Menu Plugin JavaScript -->
 <script src="admin2/js/plugins/metisMenu/metisMenu.min.js"></script>
-<!-- Custom Theme JavaScript -->
+<!-- Custom Theme JavaScript for SB Admin 2 -->
 <script src="admin2/js/sb-admin-2.js"></script>
 
 <script>
 function showNotEligibleMessage() {
-    alert("You are not eligible to vote. Your status must be 'Unvoted' and your account must be 'Active'.");
+    alert("You are not eligible to vote at this time. Your voting status must be 'Unvoted' and your account must be 'Active'. Please check your dashboard for more details.");
 }
 </script>
 

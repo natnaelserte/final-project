@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
         $errors[] = "Phone must start with 09 and be 10 digits.";
     }
     
-    if (empty($role_id) || !in_array($role_id, ['1', '2'])) $errors[] = "Invalid Role ID selected.";
+    if (empty($role_id) || !in_array($role_id, ['4', '2'])) $errors[] = "Invalid Role ID selected.";
     if (empty($password_input) || strlen($password_input) < 8) $errors[] = "Password is required and must be at least 8 characters.";
 
     // Proceed with database checks only if basic validation passes
@@ -206,8 +206,8 @@ include('head.php');
                             <label for="role_id">Role</label>
                             <select class="form-control" id="role_id" name="role_id" required>
                                 <option value="">-- Select Role --</option>
-                                <option value="1" <?php echo (isset($_POST['role_id']) && $_POST['role_id'] == '1') ? 'selected' : ''; ?>>System Admin</option>
-                                <option value="2" <?php echo (isset($_POST['role_id']) && $_POST['role_id'] == '2') ? 'selected' : ''; ?>>Staff / Faculty Dean</option>
+                                <option value="4" <?php echo (isset($_POST['role_id']) && $_POST['role_id'] == '4') ? 'selected' : ''; ?>>Mini Admin</option>
+                                <option value="2" <?php echo (isset($_POST['role_id']) && $_POST['role_id'] == '2') ? 'selected' : ''; ?>>Staff </option>
                             </select>
                         </div>
 

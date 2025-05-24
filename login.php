@@ -10,7 +10,7 @@ include('head.php'); // Your HTML <head> etc.
 
 <style>
     .container-login-custom {
-        margin-top: 0;
+        margin-top: 30px;
         margin-bottom: 50px;
         max-width: 530px;
         padding-left: 15px;
@@ -57,8 +57,8 @@ include('head.php'); // Your HTML <head> etc.
         <div class="login-box">
             <form method="post" action="login_query.php">
                 <h4 class="text-center">Login to your account</h4>
-                <p class="text-center text-muted" style="font-size: 14px;">
-                    Don’t have an account? <a href="register/index.php">Create a new account</a>
+                <p class="text-center text-muted" style="font-size: 14px; ">
+                    Don’t have an account? <a href="register/index.php" style="font-size: 14px; color:rgb(255, 145, 0); text-decoration: underline;" >Create a new account</a>
                 </p>
 
                 <div class="form-group">

@@ -67,7 +67,7 @@ if (isset($_GET['id'])) {
 
                             try {
                                 // Update the position using a prepared statement
-                                $stmt = $conn->prepare("UPDATE position SET position_name = :position_name WHERE position_id = :position_id");
+                                $stmt = $pdo->prepare("UPDATE position SET position_name = :position_name WHERE position_id = :position_id");
                                 $stmt->bindParam(':position_name', $position_name, PDO::PARAM_STR);
                                 $stmt->bindParam(':position_id', $position_id, PDO::PARAM_INT);
 

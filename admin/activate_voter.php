@@ -13,7 +13,7 @@ if (isset($_GET['user_id'])) {
         $query->execute();
 
         // Redirect back to the voter list page with a success message
-        header("Location: voters.php?account=activated");
+        header("Location: index.php?account=activated");
         exit();
     } catch (PDOException $e) {
         // Handle errors (e.g., database issues)

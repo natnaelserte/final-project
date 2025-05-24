@@ -1,6 +1,6 @@
-<?php
+<?php 
 include('session.php'); // Assuming you have session management
-include('head.php');   // Include head.php for CSS and other header elements
+include('head.php');    // Include head.php for CSS and other header elements
 ?>
 
 <body>
@@ -12,6 +12,26 @@ include('head.php');   // Include head.php for CSS and other header elements
                 <h3 class="page-header">Manage Election Positions</h3>
             </div>
         </div>
+
+        <!-- Success or Error Alert Messages -->
+        <?php
+      
+        if (isset($_SESSION['success_message'])) {
+            echo "<div class='alert alert-success alert-dismissible' role='alert'>
+                    <button type='button' class='close' data-dismiss='alert'>&times;</button>
+                    " . $_SESSION['success_message'] . "
+                  </div>";
+            unset($_SESSION['success_message']);
+        }
+
+        if (isset($_SESSION['error_message'])) {
+            echo "<div class='alert alert-danger alert-dismissible' role='alert'>
+                    <button type='button' class='close' data-dismiss='alert'>&times;</button>
+                    " . $_SESSION['error_message'] . "
+                  </div>";
+            unset($_SESSION['error_message']);
+        }
+        ?>
 
         <div class="row">
             <div class="col-lg-6">
@@ -26,21 +46,19 @@ include('head.php');   // Include head.php for CSS and other header elements
                                 <input type="text" class="form-control" name="position_name" required>
                             </div>
                             <button type="submit" name="add_position" class="btn btn-primary">Add Position</button>
-							<button class="btn btn-danger" data-toggle="modal" data-target="#deleteAllPositionsModal">Delete All Positions</button>
+                            <button class="btn btn-danger" data-toggle="modal" data-target="#deleteAllPositionsModal">Delete All Positions</button>
                         </form>
-						<?php include('delete_all_positions_modal.php'); ?>
+                        <?php include('delete_all_positions_modal.php'); ?>
 
                         <?php
-                        require 'dbcon.php'; // Database connection
+                        require 'dbcon.php';
 
                         if (isset($_POST['add_position'])) {
                             $position_name = $_POST['position_name'];
 
                             try {
-                                // Prevent SQL injection using prepared statements
                                 $stmt = $pdo->prepare("INSERT INTO position (position_name) VALUES (?)");
                                 $stmt->execute([$position_name]);
-
                                 echo "<div class='alert alert-success'>Position added successfully!</div>";
                             } catch (PDOException $e) {
                                 echo "<div class='alert alert-danger'>Error adding position: " . htmlspecialchars($e->getMessage()) . "</div>";
@@ -70,14 +88,12 @@ include('head.php');   // Include head.php for CSS and other header elements
                                 <?php
                                 require 'dbcon.php';
                                 try {
-                                    // Fetch all positions from the database
                                     $position_query = $pdo->query("SELECT * FROM position ORDER BY position_id ASC");
                                     while ($position_row = $position_query->fetch(PDO::FETCH_ASSOC)) {
                                         $position_id = $position_row['position_id'];
 
-                                        // Count the number of candidates registered for this position
                                         $candidate_count_query = $pdo->prepare("SELECT COUNT(*) AS count FROM candidate WHERE position = ?");
-                                        $candidate_count_query->execute([$position_row['position_id']]);
+                                        $candidate_count_query->execute([$position_id]);
                                         $candidate_count_row = $candidate_count_query->fetch(PDO::FETCH_ASSOC);
                                         $candidate_count = $candidate_count_row['count'];
 
@@ -85,8 +101,11 @@ include('head.php');   // Include head.php for CSS and other header elements
                                         echo "<td>" . htmlspecialchars($position_row['position_name']) . "</td>";
                                         echo "<td>" . htmlspecialchars($candidate_count) . "</td>";
                                         echo "<td>
-                                                  <a href='edit_position.php?id=" . htmlspecialchars($position_id) . "' class='btn btn-success btn-xs'>Edit</a>
-                                                  <a href='delete_position.php?id=" . htmlspecialchars($position_id) . "' class='btn btn-danger btn-xs'>Delete</a>
+                                                <a href='edit_position.php?id=" . htmlspecialchars($position_id) . "' class='btn btn-success btn-xs'>Edit</a>
+                                                <a href='delete_position.php?id=" . htmlspecialchars($position_id) . "' 
+                                                   class='btn btn-danger btn-xs' 
+                                                   onclick=\"return confirm('Are you sure you want to delete this position?');\">
+                                                   Delete</a>
                                               </td>";
                                         echo "</tr>";
                                     }
@@ -103,6 +122,7 @@ include('head.php');   // Include head.php for CSS and other header elements
         </div>
     </div>
 </div>
+
 <?php include('script.php'); ?>  <!-- Include scripts -->
 </body>
 </html>

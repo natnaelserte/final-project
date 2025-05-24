@@ -12,18 +12,17 @@ $info_message_from_session = null; // For "no changes made"
 if (isset($_POST['update_candidate_submit'])) {
     $candidate_id_to_update = $_POST['candidate_id'];
     $position_id_from_form = $_POST['position'];
-    $party_to_update = $_POST['party'];
+    $slogan_to_update = $_POST['slogan'];
     $firstname_to_update = $_POST['firstname'];
     $lastname_to_update = $_POST['lastname'];
     $year_level_to_update = $_POST['year_level'];
     $gender_to_update = $_POST['gender'];
     $current_image_path_from_form = $_POST['current_image_path'];
 
-    $target_file_path_for_db = $current_image_path_from_form; // Default to current image
-    $uploadOk = 1; // Assume success unless an error occurs
+    $target_file_path_for_db = $current_image_path_from_form;
+    $uploadOk = 1;
     $new_image_upload_attempted = false;
 
-    // Check if a new image was uploaded
     if (isset($_FILES["image"]) && $_FILES["image"]["error"] == UPLOAD_ERR_OK && !empty($_FILES["image"]["name"])) {
         $new_image_upload_attempted = true;
         $target_dir = "upload/";
@@ -34,7 +33,7 @@ if (isset($_POST['update_candidate_submit'])) {
             }
         }
 
-        if ($uploadOk == 1) { // Proceed if directory is okay
+        if ($uploadOk == 1) {
             $image_name = basename($_FILES["image"]["name"]);
             $sanitized_image_name = preg_replace("/[^a-zA-Z0-9\.\-\_]/", "", $image_name);
             $new_target_file = $target_dir . uniqid() . "_" . $sanitized_image_name;
@@ -45,7 +44,7 @@ if (isset($_POST['update_candidate_submit'])) {
                 $_SESSION['error_message_page'] = 'New file is not an image.';
                 $uploadOk = 0;
             }
-            if ($uploadOk && $_FILES["image"]["size"] > 2000000) { // 2MB limit
+            if ($uploadOk && $_FILES["image"]["size"] > 2000000) {
                 $_SESSION['error_message_page'] = 'Sorry, your new file is too large (max 2MB).';
                 $uploadOk = 0;
             }
@@ -54,39 +53,34 @@ if (isset($_POST['update_candidate_submit'])) {
                 $uploadOk = 0;
             }
 
-            if ($uploadOk == 1) { // If all validations passed so far
+            if ($uploadOk == 1) {
                 if (move_uploaded_file($_FILES["image"]["tmp_name"], $new_target_file)) {
                     $target_file_path_for_db = $new_target_file;
-                    // Delete old image if it exists, is different, and writable
                     if ($current_image_path_from_form &&
                         $current_image_path_from_form != $new_target_file &&
                         file_exists($current_image_path_from_form)) {
                         if (is_writable($current_image_path_from_form) || is_writable(dirname($current_image_path_from_form))) {
-                           @unlink($current_image_path_from_form); // Suppress unlink error if it fails, main goal is update
+                           @unlink($current_image_path_from_form);
                         }
                     }
                 } else {
                     $_SESSION['error_message_page'] = 'Sorry, there was an error saving your new file. Check permissions for upload/ directory.';
-                    $uploadOk = 0; // <<< CRITICAL FIX: Mark upload as failed
+                    $uploadOk = 0;
                 }
             }
         }
-    } // End of new image processing
+    }
 
-    // If a new image upload was ATTEMPTED and it FAILED, redirect immediately.
     if ($new_image_upload_attempted && $uploadOk == 0) {
-        if (!isset($_SESSION['error_message_page'])) { // Fallback error message
+        if (!isset($_SESSION['error_message_page'])) {
             $_SESSION['error_message_page'] = 'An unspecified error occurred during image processing. Update halted.';
         }
         header("Location: " . $_SERVER['PHP_SELF']);
         exit;
     }
 
-    // Proceed with database update if image processing was OK or no new image was attempted
     if ($uploadOk == 1) {
         try {
-            // Optional: Check if candidate_id exists before updating
-            // This adds an extra query but can give a more specific error if ID is suddenly invalid
             $check_stmt = $pdo->prepare("SELECT COUNT(*) FROM candidate WHERE candidate_id = :candidate_id");
             $check_stmt->bindParam(':candidate_id', $candidate_id_to_update, PDO::PARAM_INT);
             $check_stmt->execute();
@@ -95,7 +89,7 @@ if (isset($_POST['update_candidate_submit'])) {
             } else {
                 $sql_update = "UPDATE candidate SET 
                             position = :position, 
-                            party = :party, 
+                            slogan = :slogan,
                             firstname = :firstname, 
                             lastname = :lastname, 
                             year_level = :year_level, 
@@ -104,7 +98,7 @@ if (isset($_POST['update_candidate_submit'])) {
                         WHERE candidate_id = :candidate_id";
                 $stmt_update = $pdo->prepare($sql_update);
                 $stmt_update->bindParam(':position', $position_id_from_form, PDO::PARAM_INT);
-                $stmt_update->bindParam(':party', $party_to_update);
+                $stmt_update->bindParam(':slogan', $slogan_to_update);
                 $stmt_update->bindParam(':firstname', $firstname_to_update);
                 $stmt_update->bindParam(':lastname', $lastname_to_update);
                 $stmt_update->bindParam(':year_level', $year_level_to_update);
@@ -113,29 +107,25 @@ if (isset($_POST['update_candidate_submit'])) {
                 $stmt_update->bindParam(':candidate_id', $candidate_id_to_update, PDO::PARAM_INT);
 
                 if ($stmt_update->execute()) {
-                    if ($stmt_update->rowCount() > 0) { // <<< CRITICAL FIX: Check rowCount
+                    if ($stmt_update->rowCount() > 0) {
                         $_SESSION['success_message_page'] = 'Candidate Updated Successfully.';
                     } else {
                         $_SESSION['info_message_page'] = 'Candidate data processed, but no changes were detected (data might be identical or ID was not found for actual update).';
                     }
                 } else {
                     $_SESSION['error_message_page'] = 'Error executing candidate update. Please try again.';
-                    // For detailed debugging, you might log PDO errors:
-                    // error_log("PDO Update Error: " . print_r($stmt_update->errorInfo(), true));
                 }
             }
         } catch (PDOException $e) {
             $_SESSION['error_message_page'] = "Database Error: " . htmlspecialchars($e->getMessage());
         }
     }
-    // Redirect after processing (POST/Redirect/GET pattern)
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
 // --- END: REVISED PHP LOGIC FOR UPDATING CANDIDATE ---
 
 
-// Check if the backup button was clicked
 if (isset($_POST['backup_database'])) {
     $backupResult = include('Backup/backup_db.php');
     if (is_array($backupResult) && isset($backupResult['success']) && $backupResult['success']) {
@@ -147,19 +137,16 @@ if (isset($_POST['backup_database'])) {
     exit;
 }
 
-// Fetch all positions for dropdowns
 $all_positions_for_dropdown = [];
 try {
     $pos_query_all = $pdo->query("SELECT position_id, position_name FROM position ORDER BY position_name ASC");
     $all_positions_for_dropdown = $pos_query_all->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    if (!isset($_SESSION['error_message_page'])) { // Avoid overwriting existing errors
+    if (!isset($_SESSION['error_message_page'])) {
         $_SESSION['error_message_page'] = "Error fetching positions list: " . htmlspecialchars($e->getMessage());
     }
 }
 
-
-// Display session messages and then clear them
 if (isset($_SESSION['success_message_page'])) {
     $success_message_from_session = $_SESSION['success_message_page'];
     unset($_SESSION['success_message_page']);
@@ -168,15 +155,12 @@ if (isset($_SESSION['error_message_page'])) {
     $error_message_from_session = $_SESSION['error_message_page'];
     unset($_SESSION['error_message_page']);
 }
-if (isset($_SESSION['info_message_page'])) { // For info messages
+if (isset($_SESSION['info_message_page'])) {
     $info_message_from_session = $_SESSION['info_message_page'];
     unset($_SESSION['info_message_page']);
 }
 
-
-// Fetch candidate data for charts
 try {
-    // Positions count for bar chart
     $positionsData = $pdo->query("SELECT position, COUNT(*) as count FROM candidate GROUP BY position")->fetchAll(PDO::FETCH_ASSOC);
     $yearLevelsData = $pdo->query("
         SELECT year_level, gender, COUNT(*) as count 
@@ -201,8 +185,6 @@ try {
             $uniqueYearLevels[] = $data['year_level'];
         }
     }
-    // sort($uniqueYearLevels); // Optional: sort if needed and not guaranteed by SQL
-
     foreach ($uniqueYearLevels as $year) {
         $maleCounts[$year] = 0; $femaleCounts[$year] = 0;
     }
@@ -224,27 +206,21 @@ try {
     }
 
 } catch (PDOException $e) {
-    if (!isset($_SESSION['error_message_page'])) { // Avoid overwriting
+    if (!isset($_SESSION['error_message_page'])) {
         $_SESSION['error_message_page'] = "Database error fetching chart data: " . htmlspecialchars($e->getMessage());
     }
     $positionNames = $positionCounts = $jsYearLevels = $jsMaleCounts = $jsFemaleCounts = [];
     $maleGenderCount = $femaleGenderCount = 0;
 }
-
 ?>
 
 <body>
 <div id="wrapper">
-
-    <!-- Navigation -->
     <?php include('side_bar.php'); ?>
-
-    <!-- Page Content -->
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
                 <h3 class="page-header">Candidate List</h3>
-                 <!-- BEGIN: Display Session Messages -->
                 <?php if ($success_message_from_session): ?>
                     <div class="alert alert-success alert-dismissable">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -257,17 +233,15 @@ try {
                         <?php echo htmlspecialchars($error_message_from_session); ?>
                     </div>
                 <?php endif; ?>
-                <?php if ($info_message_from_session): // Display info messages ?>
+                <?php if ($info_message_from_session): ?>
                     <div class="alert alert-info alert-dismissable">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                         <?php echo htmlspecialchars($info_message_from_session); ?>
                     </div>
                 <?php endif; ?>
-                <!-- END: Display Session Messages -->
             </div>
         </div>
 
-        <!-- Centered Buttons -->
         <div class="row">
             <div class="col-lg-12 text-center" style="margin-bottom: 20px;">
                 <button class="btn btn-success" data-toggle="modal" data-target="#myModal">Add Candidate</button>
@@ -277,7 +251,6 @@ try {
             </div>
         </div>
 
-        <!-- Backup Button -->
         <div class="row">
             <div class="col-lg-12 text-right" style="margin-bottom: 10px;">
                 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" style="display: inline-block;">
@@ -290,9 +263,7 @@ try {
             <div class="panel-heading">
                 <h4 class="modal-title" id="myModalLabel PanelTitle">
                     <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            Candidate List
-                        </div>
+                        <div class="panel-heading">Candidate List</div>
                     </div>
                 </h4>
             </div>
@@ -303,7 +274,7 @@ try {
                         <tr>
                             <th>Image</th>
                             <th>Position</th>
-                            <th>Party</th>
+                            <th>Slogan</th>
                             <th>Firstname</th>
                             <th>Lastname</th>
                             <th>Year Level</th>
@@ -320,9 +291,9 @@ try {
                                 $position_name_display = htmlspecialchars($row_candidate['position_name'] ?? 'N/A');
                                 ?>
                                 <tr>
-                                    <td width="50"><img src="<?php echo htmlspecialchars($row_candidate['img']); ?>?t=<?php echo time(); // Cache buster ?>" width="50" height="50" class="img-rounded"></td>
+                                    <td width="50"><img src="<?php echo htmlspecialchars($row_candidate['img']); ?>?t=<?php echo time(); ?>" width="50" height="50" class="img-rounded"></td>
                                     <td><?php echo $position_name_display; ?></td>
-                                    <td><?php echo htmlspecialchars($row_candidate['party']); ?></td>
+                                    <td><?php echo htmlspecialchars($row_candidate['slogan']); ?></td>
                                     <td><?php echo htmlspecialchars($row_candidate['firstname']); ?></td>
                                     <td><?php echo htmlspecialchars($row_candidate['lastname']); ?></td>
                                     <td><?php echo htmlspecialchars($row_candidate['year_level']); ?></td>
@@ -333,7 +304,6 @@ try {
                                            data-toggle="modal" class="btn btn-danger btn-outline">
                                             <i class="fa fa-trash-o"></i> Delete
                                         </a>
-                                        <?php include('delete_candidate_modal.php'); ?>
                                         
                                         <a rel="tooltip" title="Edit"
                                            class="btn btn-success btn-outline edit-candidate-btn"
@@ -341,7 +311,7 @@ try {
                                            data-target="#universalEditCandidateModal"
                                            data-candidate_id="<?php echo htmlspecialchars($row_candidate['candidate_id']); ?>"
                                            data-position_id="<?php echo htmlspecialchars($row_candidate['position']); ?>"
-                                           data-party="<?php echo htmlspecialchars($row_candidate['party']); ?>"
+                                           data-slogan="<?php echo htmlspecialchars($row_candidate['slogan']); ?>"
                                            data-firstname="<?php echo htmlspecialchars($row_candidate['firstname']); ?>"
                                            data-lastname="<?php echo htmlspecialchars($row_candidate['lastname']); ?>"
                                            data-year_level="<?php echo htmlspecialchars($row_candidate['year_level']); ?>"
@@ -349,6 +319,7 @@ try {
                                            data-img_path="<?php echo htmlspecialchars($row_candidate['img']); ?>">
                                             <i class="fa fa-pencil"></i> Edit
                                         </a>
+                                        <?php include('delete_candidate_modal.php'); // MOVED HERE ?>
                                     </td>
                                 </tr>
                                 <?php
@@ -363,7 +334,6 @@ try {
             </div>
         </div>
 
-        <!-- UNIVERSAL EDIT CANDIDATE MODAL -->
         <div class="modal fade" id="universalEditCandidateModal" tabindex="-1" role="dialog" aria-labelledby="editCandidateModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -375,7 +345,6 @@ try {
                         <div class="modal-body">
                             <input type="hidden" name="candidate_id" id="edit_candidate_id_field">
                             <input type="hidden" name="current_image_path" id="edit_current_image_path_field">
-
                             <div class="form-group">
                                 <label for="edit_position_field">Position</label>
                                 <select class="form-control" name="position" id="edit_position_field" required>
@@ -392,8 +361,8 @@ try {
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="edit_party_field">Party</label>
-                                <input class="form-control" name="party" id="edit_party_field" type="text" required>
+                                <label for="edit_slogan_field">Slogan</label>
+                                <input class="form-control" name="slogan" id="edit_slogan_field" type="text" required>
                             </div>
                             <div class="form-group">
                                 <label for="edit_firstname_field">Firstname</label>
@@ -427,7 +396,7 @@ try {
                                 <img src="" id="edit_current_image_preview" width="100" alt="Current Image" class="img-thumbnail" style="margin-bottom:10px; display:none;"><br>
                                 <label for="edit_new_image_field">New Image (Optional)</label>
                                 <input type="file" name="image" id="edit_new_image_field" class="form-control-file">
-                                <small class="form-text text-muted">Leave blank to keep the current image. Max 2MB (JPG, PNG, GIF, JPEG).</small>
+                                <small class="form-text text-muted">Leave blank to keep current image. Max 2MB (JPG, PNG, GIF, JPEG).</small>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -438,28 +407,18 @@ try {
                 </div>
             </div>
         </div>
-        <!-- END: UNIVERSAL EDIT CANDIDATE MODAL -->
 
-
-        <!-- Charts below the table -->
         <div class="row" style="margin-top: 40px;">
-            <div class="col-lg-12">
-                <div id="positionsBarChart" style="width: 100%; height: 400px;"></div>
-            </div>
+            <div class="col-lg-12"><div id="positionsBarChart" style="width: 100%; height: 400px;"></div></div>
         </div>
         <div class="row" style="margin-top: 40px;">
-            <div class="col-lg-12">
-                <div id="yearLevelLineChart" style="width: 100%; height: 400px;"></div>
-            </div>
+            <div class="col-lg-12"><div id="yearLevelLineChart" style="width: 100%; height: 400px;"></div></div>
         </div>
         <div class="row" style="margin-top: 40px; margin-bottom: 50px;">
-            <div class="col-lg-12">
-                <div id="genderPieChart" style="width: 100%; height: 400px;"></div>
-            </div>
+            <div class="col-lg-12"><div id="genderPieChart" style="width: 100%; height: 400px;"></div></div>
         </div>
-
-    </div> <!-- /#page-wrapper -->
-</div> <!-- /#wrapper -->
+    </div>
+</div>
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
@@ -467,7 +426,6 @@ try {
     google.charts.setOnLoadCallback(drawCharts);
 
     function drawCharts() {
-        // Positions Bar Chart
         var positionsDataTable = new google.visualization.DataTable();
         positionsDataTable.addColumn('string', 'Position');
         positionsDataTable.addColumn('number', 'Count');
@@ -483,8 +441,6 @@ try {
         if (positionsDataTable.getNumberOfRows() > 0) positionsChart.draw(positionsDataTable, positionsOptions);
         else { document.getElementById('positionsBarChart').innerHTML = '<p style="text-align:center; padding-top:50px;">No position data for chart.</p>';}
 
-
-        // Year Level Multi-line Chart
         var yearLevelDataTable = new google.visualization.DataTable();
         yearLevelDataTable.addColumn('string', 'Year Level');
         yearLevelDataTable.addColumn('number', 'Male');
@@ -502,8 +458,6 @@ try {
         if (yearLevelDataTable.getNumberOfRows() > 0) yearLevelChart.draw(yearLevelDataTable, yearLevelOptions);
         else { document.getElementById('yearLevelLineChart').innerHTML = '<p style="text-align:center; padding-top:50px;">No year level data for chart.</p>';}
 
-
-        // Gender Pie Chart
         var genderDataTable = google.visualization.arrayToDataTable([
             ['Gender', 'Count'],
             ['Male', <?php echo $maleGenderCount; ?>],
@@ -520,7 +474,7 @@ try {
         $('.edit-candidate-btn').on('click', function() {
             var candidateId = $(this).data('candidate_id');
             var positionId  = $(this).data('position_id');
-            var party       = $(this).data('party');
+            var slogan      = $(this).data('slogan');
             var firstname   = $(this).data('firstname');
             var lastname    = $(this).data('lastname');
             var yearLevel   = $(this).data('year_level');
@@ -530,37 +484,33 @@ try {
             var modal = $('#universalEditCandidateModal');
             modal.find('#edit_candidate_id_field').val(candidateId);
             modal.find('#edit_position_field').val(positionId);
-            modal.find('#edit_party_field').val(party);
+            modal.find('#edit_slogan_field').val(slogan);
             modal.find('#edit_firstname_field').val(firstname);
             modal.find('#edit_lastname_field').val(lastname);
             modal.find('#edit_year_level_field').val(yearLevel);
             modal.find('#edit_gender_field').val(gender);
             modal.find('#edit_current_image_path_field').val(imgPath);
             
-            if(imgPath && imgPath !== "" && imgPath !== "upload/") { // More robust check for valid image path
-                modal.find('#edit_current_image_preview').attr('src', imgPath + '?t=' + new Date().getTime()).show(); // Cache buster for preview
+            if(imgPath && imgPath !== "" && imgPath !== "upload/") {
+                modal.find('#edit_current_image_preview').attr('src', imgPath + '?t=' + new Date().getTime()).show();
             } else {
                 modal.find('#edit_current_image_preview').attr('src', '').hide();
             }
-            modal.find('#edit_new_image_field').val(''); // Clear file input
+            modal.find('#edit_new_image_field').val('');
         });
 
         $('#universalEditCandidateModal').on('hidden.bs.modal', function () {
-            $(this).find('form')[0].reset(); // Reset all form fields
+            $(this).find('form')[0].reset();
             $(this).find('#edit_current_image_preview').attr('src', '').hide();
         });
 
-        // Initialize DataTables if it exists and not already initialized
         if ($.fn.dataTable && !$.fn.dataTable.isDataTable('#dataTables-example')) {
             $('#dataTables-example').DataTable({
                 responsive: true,
-                // "order": [[ 3, "asc" ]] // Example: default order by 4th column (Firstname)
             });
         }
     });
 </script>
-
-<?php include('script.php'); // jQuery, Bootstrap JS, DataTables JS etc. ?>
-
+<?php include('script.php'); ?>
 </body>
 </html>
