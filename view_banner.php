@@ -5,10 +5,10 @@ include('admin/dbcon.php');
 try {
     $count_stmt = $pdo->prepare("
         SELECT COUNT(*) FROM (
-            SELECT id 
-            FROM announcements 
-            WHERE read_status = 0 
-            ORDER BY created_at DESC 
+            SELECT id
+            FROM announcements
+            WHERE read_status = 0
+            ORDER BY created_at DESC
             LIMIT 3
         ) AS recent_unread
     ");
@@ -31,24 +31,21 @@ try {
 
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="nav navbar-nav navbar-center nav-links">
-        <li><a href="index.php">Home</a></li>
+        <li><a href="index.php" class="<?php if (basename($_SERVER['PHP_SELF']) == 'index.php') echo 'active'; ?>">Home</a></li>
         <li><a href="candidate_path.php" class="<?php if (basename($_SERVER['PHP_SELF']) == 'candidate_path.php') echo 'active'; ?>">Candidates</a></li>
         <li><a href="about.php" class="<?php if (basename($_SERVER['PHP_SELF']) == 'about.php') echo 'active'; ?>">About</a></li>
         <li><a href="live.php" class="<?php if (basename($_SERVER['PHP_SELF']) == 'live.php') echo 'active'; ?>">Live</a></li>
         <li><a href="register/index.php" id="register-link">Register</a></li>
         <li><a href="login.php" id="login-link">Login</a></li>
-        <li><a href="faq.php">FAQ</a></li>
-        <div class="announcement-link">
-      
-
-                <a href="announcement.php">
-                    📢  
-                    <?php if ($unread_count > 0): ?>
-                        <span class="badge"><?= $unread_count ?></span>
-                    <?php endif; ?>
-                </a>
-          
-             </div>
+        <li><a href="faq.php" class="<?php if (basename($_SERVER['PHP_SELF']) == 'faq.php') echo 'active'; ?>">FAQ</a></li>
+        <li class="announcement-link">
+          <a href="announcement.php">
+            📢
+            <?php if ($unread_count > 0): ?>
+              <span class="badge"><?= $unread_count ?></span>
+            <?php endif; ?>
+          </a>
+        </li>
       </ul>
     </div>
   </div>

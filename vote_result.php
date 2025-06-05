@@ -12,7 +12,7 @@ include('sess.php');
                     <h1 class="text-center mb-4 review-page-title">Review Your Ballot</h1> 
 
                     <?php
-                    if (isset($_POST['submit'])) {
+                    if (isset($_POST['submit_ballot_action'])) {
                         $votes = array();
                         $positions_with_candidates = array();
                         $all_fetched_positions_for_review = []; // To store position names for cleaner iteration
@@ -48,40 +48,43 @@ include('sess.php');
                                 <h2 class="review-section-title">Your Selections:</h2>
                                 <div class="row justify-content-center"> 
                                 <?php
-                                // Iterate through all positions to maintain order and show "No selection" if applicable
+                                // Variable to track if any candidates were displayed
+                                $any_candidates_displayed = false;
+
+                                // Iterate through all positions to maintain order and show ONLY positions with selected candidates
                                 foreach ($all_fetched_positions_for_review as $pos_id => $pos_data) {
                                     $position_key_name_for_vote = $pos_data['key_name'];
                                     $candidate_id = isset($votes[$position_key_name_for_vote]) ? $votes[$position_key_name_for_vote] : "";
 
-                                    echo '<div class="col-lg-6 col-md-8 col-sm-12 mb-4">'; // Control width of each review card
-                                    echo '  <div class="reviewed-vote-card">';
-                                    echo '    <h4 class="reviewed-position-title">' . $pos_data['display_name'] . '</h4>';
-                                    echo '    <div class="reviewed-candidate-info">';
+                                    // Only display positions where a candidate was selected
                                     if (!empty($candidate_id)) {
                                         $candidate_stmt = $pdo->prepare("SELECT firstname, lastname, img FROM `candidate` WHERE `candidate_id` = ?");
                                         $candidate_stmt->execute([$candidate_id]);
                                         $fetch = $candidate_stmt->fetch(PDO::FETCH_ASSOC);
 
                                         if ($fetch) {
+                                            $any_candidates_displayed = true;
+                                            echo '<div class="col-lg-6 col-md-8 col-sm-12 mb-4">'; // Control width of each review card
+                                            echo '  <div class="reviewed-vote-card">';
+                                            echo '    <h4 class="reviewed-position-title">' . $pos_data['display_name'] . '</h4>';
+                                            echo '    <div class="reviewed-candidate-info">';
                                             $img_path = "admin2/" . htmlspecialchars($fetch['img']);
                                             echo '<img src="' . $img_path . '" alt="Candidate Image" class="reviewed-candidate-img">';
                                             echo '<span class="reviewed-candidate-name">' . htmlspecialchars($fetch['firstname']) . " " . htmlspecialchars($fetch['lastname']) . '</span>';
-                                        } else {
-                                            echo '<span class="no-selection-text">Error: Candidate details not found.</span>';
+                                            echo '    </div>'; // end .reviewed-candidate-info
+                                            echo '  </div>';   // end .reviewed-vote-card
+                                            echo '</div>';   // end .col-
                                         }
-                                    } else {
-                                        // Only display "No selection" for positions that were *supposed* to have a selection
-                                        // This logic might need refinement if you want to show all positions regardless
-                                        // For now, we only show positions where a vote was possible (i.e., in $votes)
-                                        // To show ALL positions, iterate over $all_fetched_positions_for_review
-                                        // and check if $votes[$pos_data['key_name']] is empty.
-                                        echo '<span class="no-selection-text"><i>No candidate selected for this position.</i></span>';
                                     }
-                                    echo '    </div>'; // end .reviewed-candidate-info
-                                    echo '  </div>';   // end .reviewed-vote-card
-                                    echo '</div>';   // end .col-
-                                 }
-                                 ?>
+                                }
+
+                                // Display a message if no candidates were selected
+                                if (!$any_candidates_displayed) {
+                                    echo '<div class="col-12 text-center">';
+                                    echo '<p class="alert alert-warning">You have not selected any candidates. Please go back to make your selections.</p>';
+                                    echo '</div>';
+                                }
+                                ?>
                                 </div> 
 
                                  <div class="review-confirmation-section text-center mt-4 pt-4">

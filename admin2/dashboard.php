@@ -96,7 +96,7 @@ try {
     var votedOptions = {
       title: 'Voter Turnout',
       pieHole: 0.4,
-      colors: ['#28a745', '#dc3545'],
+      colors: ['#90D1CA', '#dc3545'], // Primary color for voted
       backgroundColor: 'transparent',
       legend: { position: 'bottom' }
     };
@@ -106,9 +106,9 @@ try {
     // Data for Bar Chart (Candidates, Voters, Positions)
     var overviewData = google.visualization.arrayToDataTable([
         ["Entity", "Total Count", { role: "style" } ],
-        ["Candidates", <?php echo (int)$val_total_candidates; ?>, "#007bff"],
-        ["Registered Voters", <?php echo (int)$val_total_voters; ?>, "#17a2b8"],
-        ["Election Positions", <?php echo (int)$val_total_positions; ?>, "#ffc107"]
+        ["Candidates", <?php echo (int)$val_total_candidates; ?>, "#90D1CA"], // Primary color
+        ["Registered Voters", <?php echo (int)$val_total_voters; ?>, "#75B5AE"], // Darker primary
+        ["Election Positions", <?php echo (int)$val_total_positions; ?>, "#A8DCD6"] // Lighter primary
     ]);
     var overviewOptions = {
         title: "Election Overview",
@@ -132,7 +132,7 @@ try {
     var complaintOptions = {
       title: 'Complaint Status',
       pieHole: 0.4,
-      colors: ['#ffc107', '#fd7e14', '#28a745'], // Yellow, Orange, Green
+      colors: ['#ffc107', '#fd7e14', '#90D1CA'], // Primary color for resolved
       backgroundColor: 'transparent',
       legend: { position: 'bottom' }
     };
@@ -146,7 +146,21 @@ try {
 </script>
 
 <style>
-    /* Custom styles for dashboard elements */
+    /* Custom styles with #90D1CA as primary color */
+    :root {
+        --primary-color: #90D1CA;
+        --primary-dark: #75B5AE;  /* Darker shade for hover/active states */
+        --primary-light: #A8DCD6; /* Lighter shade for backgrounds */
+        --primary-very-light: #E5F4F2; /* Very light shade for subtle backgrounds */
+        --text-on-primary: #333333; /* Dark text on primary color */
+        --text-light: #ffffff;
+        --text-dark: #333333;
+        --accent-color: #FF9E80; /* Complementary accent if needed */
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+        --info-color: #17a2b8;
+    }
+
     .chart-container {
         padding: 15px;
         background-color: #f9f9f9;
@@ -159,15 +173,23 @@ try {
     .panel-footer .pull-left { line-height: 1.5; }
 
     .announcement-card-display {
-        background: #f8f9fa;
+        background: var(--primary-very-light);
         padding: 15px;
-        border-left: 4px solid #17a2b8; /* Info color */
+        border-left: 4px solid var(--primary-color);
         border-radius: 5px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         margin-bottom: 15px;
     }
-    .announcement-card-display h5 { margin-top: 0; font-weight: bold; color: #007bff; }
-    .announcement-card-display .meta { font-size: 0.9em; color: #6c757d; margin-top: 10px; }
+    .announcement-card-display h5 {
+        margin-top: 0;
+        font-weight: bold;
+        color: var(--primary-dark);
+    }
+    .announcement-card-display .meta {
+        font-size: 0.9em;
+        color: #6c757d;
+        margin-top: 10px;
+    }
 
     /* Style for the complaint link panel */
     .complaints-link-panel .panel-body {
@@ -177,10 +199,76 @@ try {
         justify-content: center;
         min-height: 150px; /* Give it some height */
     }
-    .complaints-link-panel .huge-icon { font-size: 3em; margin-bottom: 10px; }
+    .complaints-link-panel .huge-icon {
+        font-size: 3em;
+        margin-bottom: 10px;
+    }
+
+    /* Override Bootstrap panel colors */
+    .panel-primary {
+        border-color: var(--primary-color);
+    }
+    .panel-primary > .panel-heading {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: var(--text-dark);
+    }
+    .panel-primary a {
+        color: var(--primary-dark);
+    }
+    .panel-primary a:hover {
+        color: var(--primary-color);
+    }
+
+    /* Override button colors */
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-dark);
+        color: var(--text-dark);
+    }
+    .btn-primary:hover, .btn-primary:focus {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+        color: var(--text-dark);
+    }
+
+    /* Override alert colors */
+    .alert-info {
+        background-color: var(--primary-very-light);
+        border-color: var(--primary-light);
+        color: var(--text-dark);
+    }
+
+    /* Panel success override */
+    .panel-success {
+        border-color: var(--primary-color);
+    }
+    .panel-success > .panel-heading {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: var(--text-dark);
+    }
+
+    /* Button success override */
+    .btn-success {
+        background-color: var(--primary-color);
+        border-color: var(--primary-dark);
+        color: var(--text-dark);
+    }
+    .btn-success:hover, .btn-success:focus {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+        color: var(--text-dark);
+    }
 </style>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<link rel="icon" type="image/jpg" href="img/favicon.ico" />
+    <title>Admin Dashboard - Election Management</title>
+    <!-- Modern Admin Theme CSS -->
+    <link rel="stylesheet" href="../admin/css/modern-admin.css">
+    <link rel="icon" type="image/jpg" href="img/favicon.ico" />
+</head>
 <body>
 <div id="wrapper">
 
@@ -189,7 +277,9 @@ try {
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Dashboard</h1>
+                <div class="modern-page-header">
+                    <h1><i class="fa fa-dashboard"></i> Admin Dashboard</h1>
+                </div>
             </div>
         </div>
 
@@ -200,7 +290,7 @@ try {
         <!-- Summary Cards Row -->
         <div class="row">
             <div class="col-lg-3 col-md-6">
-                <div class="panel panel-primary">
+                <div class="panel modern-stat-card primary">
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-xs-3"><i class="fa fa-users fa-2x"></i></div>
@@ -210,11 +300,17 @@ try {
                             </div>
                         </div>
                     </div>
-                    <a href="index.php"><div class="panel-footer"><span class="pull-left">View Details</span><span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span><div class="clearfix"></div></div></a>
+                    <a href="candidate.php">
+                        <div class="panel-footer">
+                            <span class="pull-left">View Details</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
-                <div class="panel panel-primary">
+                <div class="panel modern-stat-card primary">
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-xs-3"><i class="fa fa-group fa-2x"></i></div>
@@ -224,11 +320,17 @@ try {
                             </div>
                         </div>
                     </div>
-                    <a href="voters.php"><div class="panel-footer"><span class="pull-left">View Details</span><span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span><div class="clearfix"></div></div></a>
+                    <a href="voters.php">
+                        <div class="panel-footer">
+                            <span class="pull-left">View Details</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
-                <div class="panel panel-primary">
+                <div class="panel modern-stat-card primary">
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-xs-3"><i class="fa fa-sitemap fa-2x"></i></div>
@@ -238,21 +340,33 @@ try {
                             </div>
                         </div>
                     </div>
-                    <a href="add_position.php"><div class="panel-footer"><span class="pull-left">Manage Positions</span><span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span><div class="clearfix"></div></div></a>
+                    <a href="add_position.php">
+                        <div class="panel-footer">
+                            <span class="pull-left">Manage Positions</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
-                <div class="panel panel-red">
+                <div class="panel modern-stat-card success">
                      <div class="panel-heading">
                         <div class="row">
-                            <div class="col-xs-3"><i class="fa fa-check-square-o fa-2x"></i></div>
+                            <div class="col-xs-3"><i class="fa fa-check-circle fa-2x"></i></div>
                             <div class="col-xs-9 text-right">
                                 <div class="huge"><?php echo htmlspecialchars($val_total_voted); ?></div>
                                 <div>Voters Voted</div>
                             </div>
                         </div>
                     </div>
-                    <a href="voted.php"><div class="panel-footer"><span class="pull-left">View Details</span><span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span><div class="clearfix"></div></div></a>
+                    <a href="voted.php">
+                        <div class="panel-footer">
+                            <span class="pull-left">View Details</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -261,13 +375,34 @@ try {
         <!-- Row for Charts -->
         <div class="row">
             <div class="col-lg-4 col-md-6">
-                <div id="overview_bar_chart" class="chart-container" style="width: 100%; height: 400px;"></div>
+                <div class="panel modern-chart-panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-bar-chart"></i> Election Overview</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div id="overview_bar_chart" style="width: 100%; height: 350px;"></div>
+                    </div>
+                </div>
             </div>
             <div class="col-lg-4 col-md-6">
-                <div id="voted_pie_chart" class="chart-container" style="width: 100%; height: 400px;"></div>
+                <div class="panel modern-chart-panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-pie-chart"></i> Voter Turnout</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div id="voted_pie_chart" style="width: 100%; height: 350px;"></div>
+                    </div>
+                </div>
             </div>
-            <div class="col-lg-4 col-md-12"> <!-- Changed col-lg-5 to col-lg-4 to fit 3 charts in a row -->
-                <div id="complaint_status_chart" class="chart-container" style="width: 100%; height: 400px;"></div>
+            <div class="col-lg-4 col-md-12">
+                <div class="panel modern-chart-panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-comments"></i> Complaint Status</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div id="complaint_status_chart" style="width: 100%; height: 350px;"></div>
+                    </div>
+                </div>
             </div>
         </div>
         <hr>
@@ -276,9 +411,9 @@ try {
         <div class="row">
             <!-- Announcements Section -->
             <div class="col-lg-8"> <!-- Adjusted width for Announcements -->
-                <div class="panel panel-info">
+                <div class="panel modern-chart-panel">
                     <div class="panel-heading">
-                        <i class="fa fa-bullhorn fa-fw"></i> Announcements
+                        <h3 class="panel-title"><i class="fa fa-bullhorn fa-fw"></i> Announcements</h3>
                     </div>
                     <div class="panel-body" style="max-height: 450px; overflow-y: auto;">
                         <?php if (!empty($_SESSION['success_announcement'])): ?>
@@ -326,20 +461,32 @@ try {
 
             <!-- Complaint Link Section -->
             <div class="col-lg-4"> <!-- Adjusted width for Complaint Link -->
-                <div class="panel panel-primary complaints-link-panel">
+                <div class="panel modern-chart-panel complaints-link-panel">
                     <div class="panel-heading">
-                        <i class="fa fa-comments-o fa-fw"></i> Complaints Overview
+                        <h3 class="panel-title"><i class="fa fa-comments-o fa-fw"></i> Complaints Overview</h3>
                     </div>
                     <div class="panel-body text-center">
-                        <i class="fa fa-exclamation-triangle fa-2x huge-icon text-warning" aria-hidden="true"></i>
-                        <h4>Total Complaints: <?php echo htmlspecialchars($complaint_stats['total']); ?></h4>
-                        <p>
-                            Pending: <span class="badge" style="background-color: #ffc107; color: black;"><?php echo htmlspecialchars($complaint_stats['pending']); ?></span> |
-                            In Progress: <span class="badge" style="background-color: #fd7e14;"><?php echo htmlspecialchars($complaint_stats['in_progress']); ?></span> |
-                            Resolved: <span class="badge" style="background-color: #28a745;"><?php echo htmlspecialchars($complaint_stats['resolved']); ?></span>
-                        </p>
-                        <a href="staff_complaint.php" class="btn btn-primary btn-block">
-                            <i class="fa fa-external-link"></i> Go to Complaint Management
+                        <i class="fa fa-exclamation-triangle fa-3x huge-icon" style="color: #ffc107; margin-bottom: 15px;" aria-hidden="true"></i>
+                        <h4 style="color: #495057; margin-bottom: 20px;">Total Complaints: <?php echo htmlspecialchars($complaint_stats['total']); ?></h4>
+                        <div style="margin-bottom: 20px;">
+                            <div style="margin-bottom: 8px;">
+                                <span class="badge" style="background-color: #ffc107; color: black; padding: 6px 12px;">
+                                    Pending: <?php echo htmlspecialchars($complaint_stats['pending']); ?>
+                                </span>
+                            </div>
+                            <div style="margin-bottom: 8px;">
+                                <span class="badge" style="background-color: #fd7e14; padding: 6px 12px;">
+                                    In Progress: <?php echo htmlspecialchars($complaint_stats['in_progress']); ?>
+                                </span>
+                            </div>
+                            <div style="margin-bottom: 8px;">
+                                <span class="badge" style="background-color: #28a745; padding: 6px 12px;">
+                                    Resolved: <?php echo htmlspecialchars($complaint_stats['resolved']); ?>
+                                </span>
+                            </div>
+                        </div>
+                        <a href="staff_complaint.php" class="btn btn-success btn-block">
+                            <i class="fa fa-external-link"></i> Manage Complaints
                         </a>
                     </div>
                 </div>

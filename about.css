@@ -1,0 +1,620 @@
+/* --------------------
+   Global Styles & Variables
+   -------------------- */
+:root {
+    --primary-color: #0056b3; /* AMU Blue - adjust if you have an official blue */
+    --secondary-color: #007bff; /* A slightly lighter blue for accents */
+    --light-blue: #e6f0ff; /* Very light blue for backgrounds */
+    --dark-text: #343a40;   /* Dark grey for primary text */
+    --medium-text: #555;   /* Medium grey for secondary text */
+    --light-text: #f8f9fa;  /* Light text for dark backgrounds */
+    --accent-color: #ffc107; /* Yellow/Gold for highlights - optional */
+    --border-color: #dee2e6;
+    --section-padding: 60px 0; /* Default padding for sections */
+    --font-family-sans-serif: 'Roboto', sans-serif; /* Assuming Roboto from your other pages */
+}
+
+body {
+    font-family: var(--font-family-sans-serif);
+    color: var(--medium-text);
+    line-height: 1.7;
+    background-color: #f9f9f9; /* Off-white background for the whole page */
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--dark-text);
+    font-weight: 600; /* Slightly bolder headings */
+}
+
+.section-padding {
+    padding: var(--section-padding);
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 50px;
+    font-size: 2.5rem; /* Larger section titles */
+    font-weight: 700;
+    color: var(--primary-color);
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.section-title::after { /* Underline effect for section titles */
+    content: '';
+    position: absolute;
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: var(--secondary-color);
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+.section-subtitle {
+    color: var(--primary-color);
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.content-image {
+    border-radius: 10px; /* Softer rounded corners */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
+    transition: transform 0.3s ease-in-out;
+}
+
+.content-image:hover {
+    transform: translateY(-5px); /* Subtle lift on hover */
+}
+
+.text-block p {
+    margin-bottom: 1.2rem;
+}
+
+/* --------------------
+   Hero Section
+   -------------------- */
+.hero-section {
+    background: linear-gradient(rgba(0, 86, 179, 0.85), rgba(0, 66, 138, 0.85)), url('img/campus_background.jpg') no-repeat center center; /* Replace with a good AMU campus background image */
+    background-size: cover;
+    color: var(--light-text);
+    padding: 100px 0;
+    text-align: center;
+    min-height: 60vh; /* Make hero section taller */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-section h1 {
+    font-size: 3rem; /* Larger hero title */
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+.hero-section p {
+    font-size: 1.25rem;
+    max-width: 700px;
+    margin: 0 auto;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* --------------------
+   Our Mission Section
+   -------------------- */
+#mission .text-block {
+    padding-right: 30px; /* Add some space between text and image on larger screens */
+}
+
+.mission-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.mission-list li {
+    font-size: 1.05rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.mission-list li i {
+    color: var(--secondary-color);
+    font-size: 1.5rem; /* Larger icons */
+    margin-right: 15px;
+    width: 25px; /* Ensure icons align */
+    text-align: center;
+}
+
+/* --------------------
+   Our Story Section
+   -------------------- */
+#story {
+    background-color: #fff; /* White background for contrast */
+}
+
+#story .text-block {
+    padding-left: 30px; /* Space between image and text on larger screens */
+}
+
+#story .btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+#story .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+/* --------------------
+   Our Leadership Section
+   -------------------- */
+.leadership-card {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 25px;
+    text-align: center;
+    margin-bottom: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%; /* Ensure cards are same height in a row */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.leadership-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 25px rgba(0, 86, 179, 0.15);
+}
+
+.leader-img {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 20px auto;
+    border: 4px solid var(--light-blue);
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.leader-name {
+    font-size: 1.3rem;
+    color: var(--dark-text);
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.leader-title {
+    font-size: 0.95rem;
+    color: var(--medium-text);
+    margin-bottom: 15px;
+    min-height: 2.8em; /* Reserve space for titles of varying lengths */
+}
+
+.leader-social i {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    transition: color 0.3s ease;
+}
+
+.leader-social i:hover {
+    color: var(--primary-color);
+}
+
+
+/* --------------------
+   Testimonials Section
+   -------------------- */
+.testimonial-section {
+    background-color: var(--light-blue); /* Light blue background */
+    position: relative;
+    overflow: hidden; /* For pseudo-elements if added */
+}
+
+.testimonial-section .section-title::after {
+    background: var(--primary-color); /* Darker underline for contrast on light blue */
+}
+
+.testimonial-logos img {
+    height: 50px;
+    margin: 0 15px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.testimonial-logos img:hover {
+    opacity: 1;
+}
+
+.testimonial-card {
+    background-color: #fff;
+    padding: 35px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px; /* For spacing if carousel is disabled */
+    text-align: left; /* Align text to left inside card */
+}
+
+.testimonial-quote-icon {
+    font-size: 2.5rem;
+    color: var(--secondary-color);
+    opacity: 0.3;
+    margin-bottom: 10px;
+}
+
+.testimonial-text {
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--medium-text);
+    margin-bottom: 25px;
+    line-height: 1.8;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.testimonial-author img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 20px;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.testimonial-author-info .name {
+    display: block;
+    font-weight: 600;
+    color: var(--dark-text);
+    font-size: 1.1rem;
+}
+
+.testimonial-author-info .title {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--medium-text);
+}
+
+/* Carousel Controls Styling */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: var(--primary-color); /* Darker background for visibility */
+    border-radius: 50%;
+    padding: 15px; /* Make them a bit bigger */
+    background-size: 50% 50%; /* Adjust icon size within the button */
+}
+.carousel-control-prev, .carousel-control-next {
+    width: 5%; /* Adjust width of the control area */
+}
+
+
+/* --------------------
+   CTA Section
+   -------------------- */
+.cta-section {
+    background: var(--primary-color); /* Use primary color for strong CTA */
+    color: var(--light-text);
+    text-align: center;
+}
+
+.cta-section h2 {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.cta-section p {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.btn-custom-primary {
+    background-color: #fff; /* White button on dark background */
+    color: var(--primary-color);
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px; /* Pill shape */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn-custom-primary:hover,
+.btn-custom-primary:focus {
+    background-color: var(--accent-color); /* Optional: use accent color on hover */
+    color: var(--dark-text);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+
+/* --------------------
+   Scroll to Top Button
+   -------------------- */
+#scrollToTopBtn {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 99;
+    border: none;
+    outline: none;
+    background-color: var(--secondary-color);
+    color: white;
+    cursor: pointer;
+    padding: 0; /* Remove padding for roundness */
+    border-radius: 50%;
+    font-size: 20px; /* Icon size */
+    width: 50px; /* Button width */
+    height: 50px; /* Button height */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, opacity 0.3s;
+    opacity: 0.8;
+    line-height: 50px; /* Center icon vertically */
+    text-align: center; /* Center icon horizontally */
+}
+
+#scrollToTopBtn:hover {
+    background-color: var(--primary-color);
+    opacity: 1;
+}
+
+#scrollToTopBtn i {
+    vertical-align: middle; /* Better vertical alignment for bootstrap icons */
+}
+
+
+/* --------------------
+   Responsive Adjustments
+   -------------------- */
+@media (max-width: 991.98px) { /* Medium devices (tablets, less than 992px) */
+    .hero-section h1 {
+        font-size: 2.5rem;
+    }
+    .hero-section p {
+        font-size: 1.1rem;
+    }
+    .section-title {
+        font-size: 2rem;
+    }
+    #mission .text-block,
+    #story .text-block {
+        padding: 0 15px; /* Adjust padding on smaller screens */
+    }
+    .content-image {
+        margin-top: 30px;
+    }
+     .testimonial-card {
+        padding: 25px;
+    }
+}
+
+@media (max-width: 767.98px) { /* Small devices (landscape phones, less than 768px) */
+    .hero-section {
+        padding: 80px 0;
+        min-height: 50vh;
+    }
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+    .section-title {
+        font-size: 1.8rem;
+        margin-bottom: 30px;
+    }
+    .section-title::after {
+        width: 60px;
+        height: 3px;
+    }
+    .leadership-card {
+        margin-bottom: 20px; /* Reduce bottom margin on smaller screens */
+    }
+    .testimonial-author img {
+        width: 50px;
+        height: 50px;
+        margin-right: 15px;
+    }
+    .testimonial-text {
+        font-size: 1rem;
+    }
+}
+/* --------------------
+   Global Styles & Variables
+   -------------------- */
+:root {
+    --primary-color: #90D1CA;   /* Your chosen primary color */
+    --secondary-color: #63B8B0; /* A slightly darker, desaturated version for accents */
+    --light-accent-bg: #E0F2F1; /* A very light version for backgrounds or subtle highlights */
+    --dark-text: #2E403E;       /* Dark teal/grey for primary text, good contrast with primary */
+    --medium-text: #58706D;     /* Medium teal/grey for secondary text */
+    --light-text: #f8f9fa;      /* Light text for dark backgrounds (can remain standard) */
+    --border-color: #C5E0DD;    /* Border color derived from primary */
+    --section-padding: 60px 0; /* Default padding for sections */
+    --font-family-sans-serif: 'Roboto', sans-serif;
+}
+
+body {
+    font-family: var(--font-family-sans-serif);
+    color: var(--medium-text); /* Updated */
+    line-height: 1.7;
+    background-color: #f9f9f9;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--dark-text); /* Updated */
+    font-weight: 600;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 50px;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color); /* Uses your new primary color */
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: var(--secondary-color); /* Uses the new secondary color */
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+.section-subtitle {
+    color: var(--primary-color); /* Uses your new primary color */
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+/* ... (rest of the styles remain the same, but will now use these new color variables) ... */
+
+/* --- Adjustments in specific sections to better suit the new color scheme --- */
+
+/* Hero Section */
+.hero-section {
+    /* You might want a background image that complements #90D1CA.
+       The gradient overlay will use the new primary color. */
+    background: linear-gradient(rgba(102, 178, 171, 0.85), rgba(76, 153, 146, 0.85)), url('img/campus_background.jpg') no-repeat center center;
+    /* The rgba values are derived from shades of #90D1CA.
+       1st: slightly lighter/more transparent version of #90D1CA (approx #66B2AB)
+       2nd: slightly darker/more transparent version of #90D1CA (approx #4C9992)
+       You might need to adjust these by eye with your chosen background image.
+       Alternatively, use your primary color directly if the image is dark enough:
+       background: linear-gradient(rgba(144, 209, 202, 0.85), rgba(144, 209, 202, 0.90)), url('img/campus_background.jpg') no-repeat center center;
+    */
+    background-size: cover;
+    color: var(--light-text);
+    padding: 100px 0;
+    text-align: center;
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Mission List Icons */
+.mission-list li i {
+    color: var(--secondary-color); /* Uses the new secondary color */
+    font-size: 1.5rem;
+    margin-right: 15px;
+    width: 25px;
+    text-align: center;
+}
+
+/* Story Section Button */
+#story .btn-outline-primary {
+    border-color: var(--primary-color); /* Uses your new primary color */
+    color: var(--primary-color); /* Uses your new primary color */
+    font-weight: 500;
+}
+
+#story .btn-outline-primary:hover {
+    background-color: var(--primary-color); /* Uses your new primary color */
+    color: #fff;
+}
+
+/* Leadership Card Hover and Social Icons */
+.leadership-card:hover {
+    transform: translateY(-8px);
+    /* The shadow color is derived from the primary color to give a subtle branded glow */
+    box-shadow: 0 12px 25px rgba(144, 209, 202, 0.2);
+}
+.leader-img {
+    /* ... existing styles ... */
+    border: 4px solid var(--light-accent-bg); /* Use the very light accent for border */
+}
+.leader-social i {
+    font-size: 1.5rem;
+    color: var(--secondary-color); /* Uses the new secondary color */
+    transition: color 0.3s ease;
+}
+.leader-social i:hover {
+    color: var(--primary-color); /* Uses your new primary color */
+}
+
+/* Testimonials Section */
+.testimonial-section {
+    background-color: var(--light-accent-bg); /* Use the new light accent background */
+    position: relative;
+    overflow: hidden;
+}
+.testimonial-section .section-title::after {
+    background: var(--primary-color); /* Uses your new primary color */
+}
+.testimonial-quote-icon {
+    font-size: 2.5rem;
+    color: var(--secondary-color); /* Uses the new secondary color */
+    opacity: 0.3;
+    margin-bottom: 10px;
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: var(--primary-color); /* Uses your new primary color */
+    border-radius: 50%;
+    padding: 15px;
+    background-size: 50% 50%;
+}
+
+/* CTA Section */
+.cta-section {
+    background: var(--primary-color); /* Uses your new primary color */
+    color: var(--light-text); /* Light text for contrast */
+    text-align: center;
+}
+.cta-section h2 {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+    color: #fff; /* Ensure heading is white on the new primary color */
+}
+.btn-custom-primary {
+    background-color: #fff; /* White button on dark background */
+    color: var(--dark-text); /* Dark text for contrast on white button */
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.btn-custom-primary:hover,
+.btn-custom-primary:focus {
+    background-color: var(--secondary-color); /* Darker accent on hover */
+    color: #fff; /* White text on darker accent */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+/* Scroll to Top Button */
+#scrollToTopBtn {
+    /* ... existing styles ... */
+    background-color: var(--secondary-color); /* Uses the new secondary color */
+}
+#scrollToTopBtn:hover {
+    background-color: var(--primary-color); /* Uses your new primary color */
+    opacity: 1;
+}

@@ -1,4 +1,12 @@
 /* css/dashboard.css */
+:root {
+    --primary-color: #90D1CA;
+    --primary-dark: #75B5AE;  /* Darker shade for hover/active states */
+    --primary-light: #A8DCD6; /* Lighter shade for backgrounds */
+    --primary-very-light: #E5F4F2; /* Very light shade for subtle backgrounds */
+    --text-on-primary: #333333; /* Dark text on primary color */
+}
+
 body {
     background-color: #f8f9fa;
 }
@@ -23,10 +31,10 @@ body {
     border-radius: 4px;
     box-shadow: 0 1px 1px rgba(0,0,0,.05);
 }
-.panel-primary { border-color: #337ab7; }
-.panel-primary > .panel-heading { color: #fff; background-color: #337ab7; border-color: #337ab7; }
-.panel-green { border-color: #5cb85c; }
-.panel-green > .panel-heading { color: #fff; background-color: #5cb85c; border-color: #5cb85c; }
+.panel-primary { border-color: var(--primary-color); }
+.panel-primary > .panel-heading { color: var(--text-on-primary); background-color: var(--primary-color); border-color: var(--primary-color); }
+.panel-green { border-color: var(--primary-color); }
+.panel-green > .panel-heading { color: var(--text-on-primary); background-color: var(--primary-color); border-color: var(--primary-color); }
 .panel-yellow { border-color: #f0ad4e; }
 .panel-yellow > .panel-heading { color: #fff; background-color: #f0ad4e; border-color: #f0ad4e; }
 .panel-red { border-color: #d9534f; }

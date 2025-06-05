@@ -1,9 +1,9 @@
 /* style_deactivate.css */
 
 :root {
-    --primary-color: #dc3545; /* "Danger" red for deactivation */
-    --primary-hover-color: #c82333;
-    --secondary-color: #ffc107; /* "Warning" amber for "all" */
+    --primary-color: #90D1CA; /* Changed to teal */
+    --primary-hover-color: #75B5AE;
+    --secondary-color: #ffc107; /* Kept warning amber for "all" */
     --secondary-hover-color: #e0a800;
     --light-gray-color: #f8f9fa;
     --medium-gray-color: #e9ecef;
@@ -79,8 +79,8 @@ select:focus,
 input[type="submit"]:focus,
 button[type="button"]:focus {
     outline: none;
-    border-color: var(--primary-color); /* Focus uses primary color */
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25); /* Adjusted for red */
+    border-color: var(--primary-color); /* Changed to teal */
+    box-shadow: 0 0 0 0.2rem rgba(144, 209, 202, 0.25); /* Changed to teal */
 }
 
 select {
@@ -95,7 +95,7 @@ select {
 
 input[type="submit"],
 button[type="button"] {
-    color: var(--white-color);
+    color: var(--text-color);
     cursor: pointer;
     font-weight: 500;
     border: none;
