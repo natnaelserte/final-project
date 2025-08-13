@@ -79,11 +79,6 @@ include('head.php'); // Your HTML <head> etc.
                     }
                     ?>
                 </div>
-
-                <div class="form-group text-right">
-                    <a href="#" class="small">Forgot password?</a>
-                </div>
-
                 <div class="form-group">
                     <button type="submit" name="login" class="btn btn-primary btn-block">Login</button>
                 </div>

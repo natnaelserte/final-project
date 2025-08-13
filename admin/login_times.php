@@ -115,9 +115,238 @@ try {
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
     <!-- Your other CSS from head.php -->
     <style>
-        /* Minor style adjustments if needed */
-        .form-inline .form-group { margin-bottom: 10px; }
-        #loginLogTable_wrapper .row:first-child > div { margin-bottom: 10px; } /* Space for datatables controls */
+        /* Define primary color variables */
+        :root {
+            --primary-color: #90D1CA;
+            --primary-dark: #75B5AE;
+            --primary-light: #A8DCD6;
+            --primary-very-light: #E5F4F2;
+            --text-on-primary: #333333;
+        }
+
+        /* Modern form styling */
+        .modern-filter-panel {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .modern-filter-panel .panel-heading {
+            background: var(--primary-color) !important;
+            color: var(--text-on-primary) !important;
+            border: none !important;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+
+        .modern-filter-panel .panel-body {
+            padding: 25px;
+            border-radius: 0 0 12px 12px;
+        }
+
+        /* Modern form controls */
+        .form-control {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(144, 209, 202, 0.25);
+            outline: none;
+        }
+
+        .input-group-addon {
+            background-color: var(--primary-light);
+            border-color: var(--primary-color);
+            color: var(--text-on-primary);
+            border-radius: 8px 0 0 8px;
+            font-weight: 500;
+        }
+
+        .input-group .form-control:first-child {
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Modern buttons */
+        .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: var(--text-on-primary);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-default {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-default:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Modern table panel */
+        .modern-table-panel {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .modern-table-panel .panel-heading {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%) !important;
+            color: white !important;
+            border: none !important;
+            padding: 20px 25px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .modern-table-panel .panel-body {
+            padding: 0;
+            background: white;
+        }
+
+        /* Modern table styling */
+        #loginLogTable {
+            margin-bottom: 0 !important;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        #loginLogTable thead th {
+            background: var(--primary-light) !important;
+            color: var(--text-on-primary) !important;
+            border: none !important;
+            padding: 15px 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        #loginLogTable tbody td {
+            padding: 12px;
+            border-bottom: 1px solid #f1f3f4;
+            vertical-align: middle;
+        }
+
+        #loginLogTable tbody tr:hover {
+            background-color: var(--primary-very-light) !important;
+        }
+
+        /* Modern chart panels */
+        .modern-chart-panel {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .modern-chart-panel .panel-heading {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: none;
+            padding: 15px 20px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .modern-chart-panel .panel-title {
+            color: #495057;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .modern-chart-panel .panel-body {
+            padding: 20px;
+            background: white;
+        }
+
+        /* Page header styling */
+        .page-header {
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            color: #495057;
+            font-weight: 300;
+        }
+
+        /* DataTables modern styling */
+        .dataTables_wrapper .dataTables_length select,
+        .dataTables_wrapper .dataTables_filter input {
+            border-radius: 6px;
+            border: 2px solid #e9ecef;
+            padding: 6px 10px;
+        }
+
+        .dataTables_wrapper .dataTables_length select:focus,
+        .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: var(--primary-light) !important;
+            border-color: var(--primary-light) !important;
+            color: var(--text-on-primary) !important;
+        }
+
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .form-inline .form-group {
+                margin-bottom: 15px;
+                width: 100%;
+            }
+
+            .form-inline .form-control {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+
+        /* Minor style adjustments */
+        .form-inline .form-group { margin-bottom: 15px; }
+        #loginLogTable_wrapper .row:first-child > div { margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -135,9 +364,9 @@ try {
                 <!-- Filtering Form -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="panel panel-default">
+                        <div class="panel modern-filter-panel">
                             <div class="panel-heading">
-                                <i class="fa fa-filter fa-fw"></i> Filters
+                                <i class="fa fa-filter fa-fw"></i> Advanced Filters
                             </div>
                             <div class="panel-body">
                                 <form method="GET" action="login_times.php" class="form-inline">
@@ -186,11 +415,11 @@ try {
 
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="panel panel-primary">
+                        <div class="panel modern-table-panel">
                             <div class="panel-heading">
-                                <i class="fa fa-list fa-fw"></i> System User Log
-                                <small>(Displaying: <?php echo date("M d, Y", strtotime($date_from)) . " - " . date("M d, Y", strtotime($date_to)); ?>)</small>
-                                <a href="export_login_log.php?date_from=<?php echo urlencode($date_from); ?>&date_to=<?php echo urlencode($date_to); ?>&filter_user=<?php echo urlencode($filter_username_or_name); ?>&filter_role_id=<?php echo urlencode($filter_role_id); ?>" class="btn btn-success btn-xs pull-right" style="margin-top: -2px;"><i class="fa fa-file-excel-o"></i> Export to Excel</a>
+                                <i class="fa fa-users fa-fw"></i> System User Login Log
+                                <small style="opacity: 0.9; margin-left: 10px;">(<?php echo date("M d, Y", strtotime($date_from)) . " - " . date("M d, Y", strtotime($date_to)); ?>)</small>
+                                <a href="export_login_log.php?date_from=<?php echo urlencode($date_from); ?>&date_to=<?php echo urlencode($date_to); ?>&filter_user=<?php echo urlencode($filter_username_or_name); ?>&filter_role_id=<?php echo urlencode($filter_role_id); ?>" class="btn btn-success btn-xs pull-right" style="margin-top: -3px; border-radius: 6px;"><i class="fa fa-file-excel-o"></i> Export Excel</a>
                             </div>
                             <div class="panel-body">
                                 <!-- Table is now fully client-side managed by DataTables if many rows -->
@@ -257,22 +486,22 @@ try {
                 <!-- Charts Row -->
                 <div class="row">
                     <div class="col-lg-6 col-md-12">
-                        <div class="panel panel-default">
+                        <div class="panel modern-chart-panel">
                             <div class="panel-heading"><h3 class="panel-title"><i class="fa fa-pie-chart fa-fw"></i> Login Time Distribution</h3></div>
                             <div class="panel-body"><canvas id="loginPieChart" style="max-height: 300px;"></canvas></div>
                         </div>
                     </div>
                     <div class="col-lg-6 col-md-12">
-                        <div class="panel panel-default">
-                             <div class="panel-heading"><h3 class="panel-title"><i class="fa fa-bar-chart fa-fw"></i> Logins per Hour <small>(Selected Range)</small></h3></div>
+                        <div class="panel modern-chart-panel">
+                             <div class="panel-heading"><h3 class="panel-title"><i class="fa fa-bar-chart fa-fw"></i> Hourly Login Activity <small style="opacity: 0.7;">(Selected Range)</small></h3></div>
                            <div class="panel-body"><canvas id="loginLineChart" style="max-height: 300px;"></canvas></div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading"><h3 class="panel-title"><i class="fa fa-line-chart fa-fw"></i> Logins per Day <small>(Selected Range)</small></h3></div>
+                        <div class="panel modern-chart-panel">
+                            <div class="panel-heading"><h3 class="panel-title"><i class="fa fa-line-chart fa-fw"></i> Daily Login Trends <small style="opacity: 0.7;">(Selected Range)</small></h3></div>
                             <div class="panel-body"><canvas id="dailyLoginChart" style="max-height: 300px;"></canvas></div>
                         </div>
                     </div>
@@ -307,17 +536,17 @@ try {
         }
 
 
-        const pieChartColors = ['#337ab7', '#f0ad4e', '#5cb85c', '#d9534f', '#5bc0de', '#343a40'];
+        const pieChartColors = ['#90D1CA', '#75B5AE', '#A8DCD6', '#E5F4F2', '#FFA87D', '#FFD166'];
 
         function renderChartOrMessage(ctx, chartConfig, dataValues) {
             // Ensure dataValues is an array of numbers
             const numericDataValues = Array.isArray(dataValues) ? dataValues.map(Number).filter(n => !isNaN(n)) : [];
-            
+
             if (numericDataValues.reduce((a, b) => a + b, 0) > 0) { // Sum of data must be > 0
                 new Chart(ctx, chartConfig);
             } else {
-                ctx.font = "16px Arial"; 
-                ctx.textAlign = "center"; 
+                ctx.font = "16px Arial";
+                ctx.textAlign = "center";
                 ctx.fillStyle = "#777";
                 ctx.fillText("No data available for this period", ctx.canvas.width / 2, ctx.canvas.height / 2);
             }
@@ -346,7 +575,7 @@ try {
                     labels: [<?php for ($i = 0; $i < 24; $i++) echo "'".str_pad($i, 2, '0', STR_PAD_LEFT).":00',"; ?>],
                     datasets: [{
                         label: 'Logins', data: hourlyDataValues,
-                        backgroundColor: 'rgba(51, 122, 183, 0.6)', borderColor: '#337ab7', borderWidth: 1
+                        backgroundColor: 'rgba(144, 209, 202, 0.6)', borderColor: '#90D1CA', borderWidth: 2
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Number of Logins' } }, x: { title: { display: true, text: 'Hour of Day' } } } }
@@ -363,7 +592,7 @@ try {
                     labels: <?php echo json_encode(array_keys($dailyLogins)); ?>,
                     datasets: [{
                         label: 'Total Logins', data: dailyDataValues,
-                        borderColor: '#5cb85c', backgroundColor: 'rgba(92, 184, 92, 0.2)', fill: true, tension: 0.1
+                        borderColor: '#75B5AE', backgroundColor: 'rgba(144, 209, 202, 0.2)', fill: true, tension: 0.1, borderWidth: 3
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Number of Logins' } }, x: { title: { display: true, text: 'Date' } } } }

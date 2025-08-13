@@ -1,10 +1,10 @@
 /* style_activate.css */
 
 :root {
-    --primary-color: #007bff; /* Standard blue for primary actions */
-    --primary-hover-color: #0056b3;
-    --secondary-color: #28a745; /* Green for "all" or secondary positive action */
-    --secondary-hover-color: #1e7e34;
+    --primary-color: #90D1CA; /* Changed to teal */
+    --primary-hover-color: #75B5AE;
+    --secondary-color: #90D1CA; /* Changed to teal */
+    --secondary-hover-color: #75B5AE;
     --light-gray-color: #f8f9fa;
     --medium-gray-color: #e9ecef;
     --dark-gray-color: #6c757d;
@@ -101,7 +101,7 @@ select {
 
 input[type="submit"],
 button[type="button"] {
-    color: var(--white-color);
+    color: var(--text-color);
     cursor: pointer;
     font-weight: 500;
     border: none;

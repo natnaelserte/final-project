@@ -1,6 +1,6 @@
 /* landing-style.css */
 :root {
-    --primary-teal: #1EA79E; /* Teal color from the image's header and primary button */
+    --primary-teal: #90D1CA; /* Updated to the new primary color */
     --dark-overlay-bg: rgba(20, 30, 40, 0.65); /* Dark semi-transparent overlay for hero */
     --hero-text-color: #ffffff;
     --service-card-bg: #ffffff;
@@ -22,7 +22,7 @@ body {
 /* Notification Banner (Adapt from previous CSS if you have one) */
 .landing-notification-banner {
     background-color: var(--primary-teal); /* Or a contrasting color */
-    color: var(--hero-text-color);
+    color: #333333; /* Dark text for better contrast */
     text-align: center;
     padding: 10px 15px;
     font-size: 1.6rem;
@@ -126,12 +126,12 @@ body {
 
 .hero-btn-primary {
     background-color: var(--primary-teal);
-    color: var(--hero-text-color);
+    color: #333333; /* Dark text for better contrast on teal */
     border-color: var(--primary-teal);
 }
 .hero-btn-primary:hover {
-    background-color: #19948B; /* Slightly darker teal */
-    color: var(--hero-text-color);
+    background-color: #75B5AE; /* Slightly darker teal */
+    color: #333333;
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
@@ -143,7 +143,7 @@ body {
 }
 .hero-btn-secondary:hover {
     background-color: var(--primary-teal);
-    color: var(--hero-text-color);
+    color: #333333;
     border-color: var(--primary-teal);
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
@@ -208,7 +208,7 @@ body {
     line-height: 1; /* Ensure icon itself doesn't add too much space */
     width: 70px; /* Circle background for icon */
     height: 70px;
-    background-color: #e0f7f6; /* Very light teal background for icon circle */
+    background-color: #E5F4F2; /* Very light teal background for icon circle */
     border-radius: 50%;
     display: flex;
     align-items: center;

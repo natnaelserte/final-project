@@ -1,7 +1,16 @@
-<?php 
-include('session.php'); 
-include('head.php'); 
+<?php
+include('session.php');
+include('head.php');
 require 'dbcon.php';
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Unvoted Users - Admin Panel</title>
+    <!-- Modern Admin Theme CSS -->
+    <link rel="stylesheet" href="../admin/css/modern-admin.css">
+</head>
+<?php
 
 try {
     $count = $pdo->query("SELECT COUNT(*) as total FROM users")->fetch(PDO::FETCH_ASSOC);
@@ -13,8 +22,8 @@ try {
     $count6 = $pdo->query("SELECT COUNT(*) as total FROM users WHERE account = 'Inactive'")->fetch(PDO::FETCH_ASSOC);
 
     $regDatesByGenderRaw = $pdo->query("
-        SELECT 
-            DATE_FORMAT(registration_date, '%Y-%m') AS reg_month, 
+        SELECT
+            DATE_FORMAT(registration_date, '%Y-%m') AS reg_month,
             gender,
             COUNT(*) AS count
         FROM users
@@ -48,61 +57,142 @@ try {
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h3 class="page-header">Unvoted Students</h3>
-            </div>
-
-            <!-- Button Section -->
-            <div class="mb-4" style="max-width: 800px; margin: 0 auto;">
-                <div class="row" style="margin-bottom: 15px;">
-                    <div class="col-xs-12 col-sm-4" style="padding: 5px;">
-                        <a href="voters.php" class="btn btn-primary btn-block btn-lg" style="font-weight: 700;">
-                            <i class="fa fa-users"></i> ALL Voters <span class="badge badge-light"><?php echo $count['total']; ?></span>
-                        </a>
-                    </div>
-                    <div class="col-xs-12 col-sm-4" style="padding: 5px;">
-                        <a href="voted.php" class="btn btn-success btn-block btn-lg" style="font-weight: 700;">
-                            <i class="fa fa-check-circle"></i> Voted <span class="badge badge-light"><?php echo $count1['total']; ?></span>
-                        </a>
-                    </div>
-                    <div class="col-xs-12 col-sm-4" style="padding: 5px;">
-                        <a href="unvoted.php" class="btn btn-danger btn-block btn-lg active" style="font-weight: 700;">
-                            <i class="fa fa-times-circle"></i> Unvoted <span class="badge badge-light"><?php echo $count2['total']; ?></span>
-                        </a>
-                    </div>
-                </div>
-                <div class="row" style="margin-bottom: 15px;">
-                    <div class="col-xs-12 col-sm-4" style="padding: 5px;">
-                        <a href="#" class="btn btn-info btn-block btn-lg" style="font-weight: 700;">
-                            <i class="fa fa-male"></i> Male <span class="badge badge-light"><?php echo $count3['total']; ?></span>
-                        </a>
-                    </div>
-                    <div class="col-xs-12 col-sm-4" style="padding: 5px;">
-                        <a href="#" class="btn btn-warning btn-block btn-lg" style="font-weight: 700; color:#212529;">
-                            <i class="fa fa-female"></i> Female <span class="badge badge-light"><?php echo $count4['total']; ?></span>
-                        </a>
-                    </div>
-                    <div class="col-xs-12 col-sm-4" style="padding: 5px;">
-                        <button type="button" class="btn btn-danger btn-block btn-lg" data-toggle="modal" data-target="#deleteAllVotersModal" style="font-weight: 700;">
-                            <i class="fa fa-trash"></i> Delete All Voters
-                        </button>
-                    </div>
+                <div class="modern-page-header">
+                    <h1><i class="fa fa-times-circle"></i> Unvoted Users</h1>
                 </div>
             </div>
+        </div>
 
-            <br /><br /><hr />
-
-            <!-- Table Panel -->
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4 class="modal-title" id="myModalLabel">
-                        <div class="panel panel-primary">
-                            <div class="panel-heading"><i class="fa fa-users"></i> Unvoted Voters List</div>
+        <!-- Statistics Cards Section -->
+        <div class="row" style="margin-bottom: 25px;">
+            <div class="col-lg-3 col-md-6">
+                <div class="panel modern-stat-card primary">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-users fa-2x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge"><?php echo $count['total']; ?></div>
+                                <div>Total Voters</div>
+                            </div>
                         </div>
-                    </h4>
+                    </div>
+                    <a href="voters.php">
+                        <div class="panel-footer">
+                            <span class="pull-left">View All</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
                 </div>
-                <div class="panel-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="panel modern-stat-card success">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-check-circle fa-2x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge"><?php echo $count1['total']; ?></div>
+                                <div>Voted</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="voted.php">
+                        <div class="panel-footer">
+                            <span class="pull-left">View Voted</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="panel modern-stat-card danger">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-times-circle fa-2x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge"><?php echo $count2['total']; ?></div>
+                                <div>Unvoted</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <span class="pull-left">Current Page</span>
+                        <span class="pull-right"><i class="fa fa-check"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="panel modern-stat-card warning">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-trash fa-2x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge" style="font-size: 1.5em;">Manage</div>
+                                <div>Delete All</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer" style="cursor: pointer;" data-toggle="modal" data-target="#deleteAllVotersModal">
+                        <span class="pull-left">Delete All Voters</span>
+                        <span class="pull-right"><i class="fa fa-trash"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gender Statistics Row -->
+        <div class="row" style="margin-bottom: 25px;">
+            <div class="col-lg-6 col-md-6">
+                <div class="panel modern-stat-card primary">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-male fa-2x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge"><?php echo $count3['total']; ?></div>
+                                <div>Total Males</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6">
+                <div class="panel modern-stat-card primary">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-female fa-2x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge"><?php echo $count4['total']; ?></div>
+                                <div>Total Females</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Panel -->
+        <div class="panel modern-table-panel">
+            <div class="panel-heading">
+                <i class="fa fa-table fa-fw"></i> Unvoted Users Directory
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover modern-table" id="dataTables-example">
                             <thead>
                                 <tr>
                                     <th>Student ID</th>
@@ -121,13 +211,13 @@ try {
                                     $query->execute();
                                     while ($row1 = $query->fetch(PDO::FETCH_ASSOC)) {
                                         echo "<tr>
-                                            <td>" . htmlspecialchars($row1['id_number']) . "</td>
+                                            <td><strong>" . htmlspecialchars($row1['id_number']) . "</strong></td>
                                             <td>" . htmlspecialchars($row1['firstname'] . " " . $row1['lastname']) . "</td>
-                                            <td>" . htmlspecialchars($row1['gender']) . "</td>
+                                            <td><span class='badge badge-secondary'>" . htmlspecialchars($row1['gender']) . "</span></td>
                                             <td>" . htmlspecialchars($row1['phone']) . "</td>
-                                            <td>" . htmlspecialchars($row1['account']) . "</td>
-                                            <td>" . htmlspecialchars($row1['status']) . "</td>
-                                            <td>" . htmlspecialchars($row1['registration_date']) . "</td>
+                                            <td><span class='badge " . ($row1['account'] === 'Active' ? 'badge-success' : 'badge-warning') . "'>" . htmlspecialchars($row1['account']) . "</span></td>
+                                            <td><span class='badge badge-danger'>" . htmlspecialchars($row1['status']) . "</span></td>
+                                            <td>" . htmlspecialchars(date('M d, Y H:i', strtotime($row1['registration_date']))) . "</td>
                                         </tr>";
                                     }
                                 } catch (PDOException $e) {
@@ -140,33 +230,51 @@ try {
                 </div>
             </div>
 
-            <!-- Charts Section -->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="panel panel-info">
-                        <div class="panel-heading"><i class="fa fa-venus-mars"></i> Gender Distribution</div>
-                        <div class="panel-body"><div id="genderChart" style="width:100%; height:300px;"></div></div>
+        <!-- Charts Section -->
+        <div class="row" style="margin-top: 30px;">
+            <div class="col-md-6 col-sm-12">
+                <div class="panel modern-chart-panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-pie-chart"></i> Gender Distribution</h3>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel panel-success">
-                        <div class="panel-heading"><i class="fa fa-check-square"></i> Voting Status</div>
-                        <div class="panel-body"><div id="votingStatusChart" style="width:100%; height:300px;"></div></div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel panel-warning">
-                        <div class="panel-heading"><i class="fa fa-user-circle"></i> Account Status</div>
-                        <div class="panel-body"><div id="accountStatusChart" style="width:100%; height:300px;"></div></div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading"><i class="fa fa-calendar"></i> Registrations Over Time by Gender</div>
-                        <div class="panel-body"><div id="registrationDateChart" style="width:100%; height:300px;"></div></div>
+                    <div class="panel-body">
+                        <div id="genderChart" style="width: 100%; height: 350px;"></div>
                     </div>
                 </div>
             </div>
+            <div class="col-md-6 col-sm-12">
+                <div class="panel modern-chart-panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-check-circle"></i> Voting Status</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div id="votingStatusChart" style="width: 100%; height: 350px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-sm-12">
+                <div class="panel modern-chart-panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-user-circle"></i> Account Status</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div id="accountStatusChart" style="width: 100%; height: 350px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <div class="panel modern-chart-panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-line-chart"></i> Registration Timeline</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div id="registrationDateChart" style="width: 100%; height: 350px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
         </div>
     </div>
 </div>
@@ -203,7 +311,13 @@ function drawCharts() {
         ['Female', <?php echo $count4['total']; ?>]
     ]);
     var genderChart = new google.visualization.PieChart(document.getElementById('genderChart'));
-    genderChart.draw(genderData, { title: 'Gender Distribution', pieHole: 0.4, colors: ['#3366CC', '#FF6699'] });
+    genderChart.draw(genderData, {
+        title: 'Gender Distribution',
+        pieHole: 0.4,
+        colors: ['#90D1CA', '#A8DCD6'],
+        backgroundColor: 'transparent',
+        legend: { position: 'bottom' }
+    });
 
     var votingStatusData = google.visualization.arrayToDataTable([
         ['Status', 'Count'],
@@ -211,7 +325,13 @@ function drawCharts() {
         ['Unvoted', <?php echo $count2['total']; ?>]
     ]);
     var votingStatusChart = new google.visualization.PieChart(document.getElementById('votingStatusChart'));
-    votingStatusChart.draw(votingStatusData, { title: 'Voting Status', pieHole: 0.4, colors: ['#28a745', '#dc3545'] });
+    votingStatusChart.draw(votingStatusData, {
+        title: 'Voting Status',
+        pieHole: 0.4,
+        colors: ['#90D1CA', '#dc3545'],
+        backgroundColor: 'transparent',
+        legend: { position: 'bottom' }
+    });
 
     var accountStatusData = google.visualization.arrayToDataTable([
         ['Account', 'Count'],
@@ -219,7 +339,13 @@ function drawCharts() {
         ['Inactive', <?php echo $count6['total']; ?>]
     ]);
     var accountStatusChart = new google.visualization.PieChart(document.getElementById('accountStatusChart'));
-    accountStatusChart.draw(accountStatusData, { title: 'Account Status', pieHole: 0.4, colors: ['#ffc107', '#6c757d'] });
+    accountStatusChart.draw(accountStatusData, {
+        title: 'Account Status',
+        pieHole: 0.4,
+        colors: ['#90D1CA', '#6c757d'],
+        backgroundColor: 'transparent',
+        legend: { position: 'bottom' }
+    });
 
     var regDataArray = [['Month', 'Male', 'Female']];
     <?php
@@ -233,11 +359,13 @@ function drawCharts() {
     regChart.draw(google.visualization.arrayToDataTable(regDataArray), {
         title: 'Registrations Over Time by Gender',
         hAxis: { title: 'Month', slantedText: true, slantedTextAngle: 45 },
-        vAxis: { title: 'Registrations' },
+        vAxis: { title: 'Registrations', minValue: 0, format: '0' },
         legend: { position: 'bottom' },
         curveType: 'function',
-        colors: ['#3366CC', '#FF6699'],
-        pointSize: 5
+        colors: ['#90D1CA', '#75B5AE'],
+        pointSize: 5,
+        backgroundColor: 'transparent',
+        chartArea: { left: 60, top: 40, width: '85%', height: '70%' }
     });
 }
 

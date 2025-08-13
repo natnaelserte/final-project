@@ -89,9 +89,9 @@
 
 // Apply the mixin to the buttons
 .btn-default { .btn-styles(@btn-default-bg); text-shadow: 0 1px 0 #fff; border-color: #ccc; }
-.btn-primary { .btn-styles(@btn-primary-bg); }
-.btn-success { .btn-styles(@btn-success-bg); }
-.btn-info    { .btn-styles(@btn-info-bg); }
+.btn-primary { .btn-styles(@btn-primary-bg); text-shadow: none; } // Removed text shadow for better readability
+.btn-success { .btn-styles(@btn-success-bg); text-shadow: none; }
+.btn-info    { .btn-styles(@btn-info-bg); text-shadow: none; }
 .btn-warning { .btn-styles(@btn-warning-bg); }
 .btn-danger  { .btn-styles(@btn-danger-bg); }
 
@@ -289,3 +289,47 @@
   @shadow: inset 0 1px 3px rgba(0,0,0,.05), 0 1px 0 rgba(255,255,255,.1);
   .box-shadow(@shadow);
 }
+
+// Pagination
+.pagination {
+  > li {
+    > a,
+    > span {
+      background-color: @pagination-bg;
+      border-color: @pagination-border;
+    }
+    &:first-child {
+      > a,
+      > span {
+        .border-left-radius(@border-radius-base);
+      }
+    }
+    &:last-child {
+      > a,
+      > span {
+        .border-right-radius(@border-radius-base);
+      }
+    }
+  }
+
+  > li > a,
+  > li > span {
+    &:hover,
+    &:focus {
+      background-color: @pagination-hover-bg;
+      border-color: @pagination-hover-border;
+    }
+  }
+
+  > .active > a,
+  > .active > span {
+    &,
+    &:hover,
+    &:focus {
+      color: #333; // Changed to dark text for better contrast on teal
+      background-color: #90D1CA; // Changed to teal
+      border-color: #75B5AE; // Changed to darker teal
+    }
+  }
+}
+

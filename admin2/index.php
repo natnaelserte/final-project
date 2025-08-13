@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 include('session.php');
 include('head.php');
 
@@ -161,4 +161,4 @@ if (isset($error_message)) {
 
 </body>
 
-</html>
+</html> -->

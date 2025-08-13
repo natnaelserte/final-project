@@ -44,21 +44,23 @@
                         <label for="edit_lastname_field">Lastname <span class="text-danger">*</span></label>
                         <input class="form-control" name="lastname" id="edit_lastname_field" type="text" required>
                     </div>
+
+                    <!-- ***** MODIFIED SECTION: Year Level to Candidate Type ***** -->
                     <div class="form-group">
-                        <label for="edit_year_level_field">Year Level <span class="text-danger">*</span></label>
-                        <select class="form-control" name="year_level" id="edit_year_level_field" required>
-                            <option value="">Select Year Level</option>
-                            <option value="1st Year">1st Year</option>
-                            <option value="2nd Year">2nd Year</option>
-                            <option value="3rd Year">3rd Year</option>
-                            <option value="4th Year">4th Year</option>
-                            <option value="5th Year">5th Year</option>
+                        <label for="edit_candidate_type_field">Candidate Type <span class="text-danger">*</span></label>
+                        <select class="form-control" name="candidate_type" id="edit_candidate_type_field" required>
+                            <option value="" disabled>Select Type</option> <!-- Default disabled option -->
+                            <option value="Student">Student</option>
+                            <option value="Faculty">Faculty</option>
+                            <!-- Add other types here if they become relevant in the future -->
                         </select>
                     </div>
+                    <!-- ***** END OF MODIFIED SECTION ***** -->
+
                     <div class="form-group">
                         <label for="edit_gender_field">Gender <span class="text-danger">*</span></label>
                         <select class="form-control" name="gender" id="edit_gender_field" required>
-                            <option value="">Select Gender</option>
+                            <option value="" disabled>Select Gender</option> <!-- Default disabled option -->
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                         </select>

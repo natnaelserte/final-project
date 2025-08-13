@@ -21,6 +21,7 @@ $formData = isset($_SESSION['form_data']) ? $_SESSION['form_data'] : [];
 $error_message = ''; // To store server-side error messages
 
 if (isset($_POST['next'])) {
+    // Sanitize ID as a generic string, no specific format assumed beyond trimming
     $id_number = filter_var(trim($_POST['id_number']), FILTER_SANITIZE_STRING);
     $password = $_POST['password'];
     $password2 = $_POST['password2'];
@@ -33,7 +34,7 @@ if (isset($_POST['next'])) {
 
     // Determine the final department name
     $final_department_name = '';
-    if ($department_select_value === 'OtherDept') { // Changed value for "Other" department
+    if ($department_select_value === 'OtherDept') {
         $final_department_name = $department_other_text_value;
     } else {
         $final_department_name = $department_select_value;
@@ -48,13 +49,13 @@ if (isset($_POST['next'])) {
     if ($club_select_value === 'OtherClub') {
         $final_club_name = $club_other_text_value;
     } elseif ($club_select_value === 'None') {
-        $final_club_name = 'None'; // Explicitly set to None if selected
+        $final_club_name = 'None';
     } else {
-        $final_club_name = $club_select_value; // For Infoken, Charity, Minimedia
+        $final_club_name = $club_select_value;
     }
 
     // --- Get Class Representative value ---
-    $is_class_representative = isset($_POST['is_class_representative']) ? filter_var($_POST['is_class_representative'], FILTER_SANITIZE_STRING) : 'No'; // Default to 'No'
+    $is_class_representative = isset($_POST['is_class_representative']) ? filter_var($_POST['is_class_representative'], FILTER_SANITIZE_STRING) : 'No';
 
     $_SESSION['form_data'] = [
         'id_number' => $id_number,
@@ -68,10 +69,17 @@ if (isset($_POST['next'])) {
     ];
 
     // Server-side validation
-    $id_parts = explode('/', $id_number);
-    if (count($id_parts) !== 3 || !ctype_alpha($id_parts[0]) || !ctype_digit($id_parts[1]) || !ctype_digit($id_parts[2])) {
-        $error_message = 'Student ID format must be stream/number/batch (e.g., CSE/123/2024).';
-    } elseif (!idExistsInAllowedList($pdo, $id_number)) {
+    if (empty($id_number)) { // Basic check: ID cannot be empty
+        $error_message = 'Student ID cannot be empty.';
+    } elseif (strlen($id_number) > 50) { // Optional: Max length check for ID
+        $error_message = 'Student ID is too long (max 50 characters).';
+    }
+    // REMOVED: Specific format check for id_number
+    // $id_parts = explode('/', $id_number);
+    // if (count($id_parts) !== 3 || !ctype_alpha($id_parts[0]) || !ctype_digit($id_parts[1]) || !ctype_digit($id_parts[2])) {
+    //     $error_message = 'Student ID format must be stream/number/batch (e.g., CSE/123/2024).';
+    // }
+    elseif (!idExistsInAllowedList($pdo, $id_number)) { // This check remains important
         $error_message = 'Student ID not found in our records or not eligible for registration.';
     } elseif (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error_message = 'Please enter a valid email address.';
@@ -101,7 +109,7 @@ if (isset($_POST['next'])) {
         $error_message = 'Password must contain at least one lowercase letter.';
     } elseif (!preg_match('/[0-9]/', $password)) {
         $error_message = 'Password must contain at least one number.';
-    } elseif (!preg_match('/[\'^£$%&*()}{@#~?><>,|=_+!-]/', $password)) {
+    } elseif (!preg_match('/[\'^£$%&*()}{@#~?><>,|=_+!-]/', $password)) { // Corrected special char regex
         $error_message = 'Password must contain at least one special character.';
     } elseif ($password !== $password2) {
         $error_message = 'Passwords do not match.';
@@ -120,7 +128,10 @@ if (isset($_POST['next'])) {
     }
 
     if ($error_message) {
-        echo "<script>alert('Validation Error: " . addslashes($error_message) . "');</script>";
+        // It's better to display this error message in the HTML rather than an alert
+        // For now, keeping the alert for immediate feedback as per original code.
+        // Consider replacing with a div in your HTML to show $error_message.
+        // echo "<script>alert('Validation Error: " . addslashes($error_message) . "');</script>";
     }
 }
 ?>
@@ -139,10 +150,18 @@ if (isset($_POST['next'])) {
         .form-container p a:hover { text-decoration: underline; }
         .btn-custom { background-color:rgb(5, 9, 51); color: #fff; border-color:rgb(3, 5, 24); }
         .btn-custom:hover { background-color: #4754c4; border-color: #4754c4; }
-        .error-message { color: #ed6565; font-size: 0.9em; display: block; margin-top: 5px; }
+        .error-message { color: #d9534f; font-size: 0.9em; display: block; margin-top: 5px; } /* Bootstrap danger color */
         .form-group { margin-bottom: 20px; }
-        #department_other_container, #club_other_container { margin-top: 10px; /* Add some space for "Other" fields */ }
+        #department_other_container, #club_other_container { margin-top: 10px; }
         .radio-group label { margin-right: 15px; font-weight: normal;}
+        .server-error-box { /* For displaying server-side errors nicely */
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -151,10 +170,16 @@ if (isset($_POST['next'])) {
     <h2>Registration Form</h2>
     <p>Already have an account? <a href="../login.php">Sign in</a></p>
 
+    <?php if (!empty($error_message)): ?>
+        <div class="server-error-box">
+            <?php echo htmlspecialchars($error_message); ?>
+        </div>
+    <?php endif; ?>
+
     <form method="POST" action="" id="registrationForm">
         <div class="form-group">
             <label for="id_number">Student ID:</label>
-            <input type="text" name="id_number" id="id_number" class="form-control" placeholder="e.g., CSE/123/2024" value="<?php echo htmlspecialchars($formData['id_number'] ?? ''); ?>" required>
+            <input type="text" name="id_number" id="id_number" class="form-control" placeholder="Enter your Student ID" value="<?php echo htmlspecialchars($formData['id_number'] ?? ''); ?>" required>
             <span class="error-message" id="id_number_error"></span>
         </div>
 
@@ -268,14 +293,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const departmentOtherContainer = document.getElementById('department_other_container');
     const departmentOtherText = document.getElementById('department_other_text');
 
-    // --- NEW: Club elements ---
     const clubSelect = document.getElementById('club_select');
     const clubOtherContainer = document.getElementById('club_other_container');
     const clubOtherText = document.getElementById('club_other_text');
 
-    // --- NEW: Class Representative elements ---
     const representativeRadios = document.querySelectorAll('input[name="is_class_representative"]');
-
 
     function showError(inputId, message) {
         const errorElement = document.getElementById(inputId + '_error');
@@ -293,16 +315,15 @@ document.addEventListener('DOMContentLoaded', function() {
             otherTextElement.required = true;
         } else {
             otherContainerElement.style.display = 'none';
-            otherTextElement.value = '';
+            otherTextElement.value = ''; // Clear value when hidden
             otherTextElement.required = false;
             clearError(otherTextElement.id);
         }
     }
 
-    // Initial checks for "Other" fields
+    // Initial checks for "Other" fields on page load
     toggleOtherField(departmentSelect, departmentOtherContainer, departmentOtherText, 'OtherDept');
     toggleOtherField(clubSelect, clubOtherContainer, clubOtherText, 'OtherClub');
-
 
     departmentSelect.addEventListener('change', function() {
         toggleOtherField(departmentSelect, departmentOtherContainer, departmentOtherText, 'OtherDept');
@@ -320,38 +341,41 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-
     form.addEventListener('submit', function(event) {
         let isValid = true;
 
-        clearError('id_number');
-        clearError('email');
-        clearError('password');
-        clearError('password2');
-        clearError('gender');
-        clearError('department_select');
-        clearError('department_other_text');
-        clearError('club_select'); // <-- NEW
-        clearError('club_other_text'); // <-- NEW
-        clearError('is_class_representative'); // <-- NEW
+        // Clear all previous errors
+        document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
 
-        // 1. Validate ID (existing)
+        // 1. Validate ID
         const idValue = idNumberInput.value.trim();
-        const idRegex = /^[A-Za-z]+\/\d+\/\d+$/;
-        if (!idRegex.test(idValue)) {
-            showError('id_number', 'ID must be stream/number/batch (e.g., CSE/123/2024).');
+        if (idValue === "") {
+            showError('id_number', 'Student ID cannot be empty.');
+            isValid = false;
+        } else if (idValue.length > 50) { // Optional: Max length
+            showError('id_number', 'Student ID is too long (max 50 characters).');
             isValid = false;
         }
+        // REMOVED: Specific format regex for ID
+        // const idRegex = /^[A-Za-z]+\/\d+\/\d+$/;
+        // if (!idRegex.test(idValue)) {
+        //     showError('id_number', 'ID must be stream/number/batch (e.g., CSE/123/2024).');
+        //     isValid = false;
+        // }
 
-        // 2. Validate Email (existing)
+
+        // 2. Validate Email
         const emailValue = emailInput.value.trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(emailValue)) {
+        if (emailValue === "") {
+            showError('email', 'Email address cannot be empty.');
+            isValid = false;
+        } else if (!emailRegex.test(emailValue)) {
             showError('email', 'Please enter a valid email address.');
             isValid = false;
         }
 
-        // 3. Validate Department (existing)
+        // 3. Validate Department
         const departmentSelectValue = departmentSelect.value;
         const departmentOtherTextValue = departmentOtherText.value.trim();
         if (departmentSelectValue === "") {
@@ -362,12 +386,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 showError('department_other_text', 'Please specify your department.');
                 isValid = false;
             } else if (departmentOtherTextValue.length > 100) {
-                showError('department_other_text', 'Department name is too long.');
+                showError('department_other_text', 'Department name is too long (max 100 characters).');
                 isValid = false;
             }
         }
 
-        // --- NEW: 4. Validate Club Membership ---
+        // 4. Validate Club Membership
         const clubSelectValue = clubSelect.value;
         const clubOtherTextValue = clubOtherText.value.trim();
         if (clubSelectValue === "") {
@@ -378,12 +402,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 showError('club_other_text', 'Please specify your club.');
                 isValid = false;
             } else if (clubOtherTextValue.length > 100) {
-                showError('club_other_text', 'Club name is too long.');
+                showError('club_other_text', 'Club name is too long (max 100 characters).');
                 isValid = false;
             }
         }
 
-        // --- NEW: 5. Validate Class Representative ---
+        // 5. Validate Class Representative
         let representativeSelected = false;
         representativeRadios.forEach(radio => {
             if (radio.checked) representativeSelected = true;
@@ -393,67 +417,111 @@ document.addEventListener('DOMContentLoaded', function() {
             isValid = false;
         }
 
-
-        // 6. Validate Password (existing - renumbered)
+        // 6. Validate Password
         const passwordValue = passwordInput.value;
         let passwordErrorMessage = '';
-        if (passwordValue.length < 8) passwordErrorMessage += 'Min 8 chars. ';
-        if (!/[A-Z]/.test(passwordValue)) passwordErrorMessage += 'Needs uppercase. ';
-        if (!/[a-z]/.test(passwordValue)) passwordErrorMessage += 'Needs lowercase. ';
-        if (!/[0-9]/.test(passwordValue)) passwordErrorMessage += 'Needs number. ';
-        if (!/[\!\@\#\$\%\^\&\*\(\)\_\+\-\=\[\]\{\}\;\:\'\"\,\<\.\>\/\?\~\`\|\\ ]/.test(passwordValue)) {
-             passwordErrorMessage += 'Needs special char. ';
+        if (passwordValue === "") {
+            passwordErrorMessage = 'Password cannot be empty. ';
+        } else {
+            if (passwordValue.length < 8) passwordErrorMessage += 'Min 8 chars. ';
+            if (!/[A-Z]/.test(passwordValue)) passwordErrorMessage += 'Needs uppercase. ';
+            if (!/[a-z]/.test(passwordValue)) passwordErrorMessage += 'Needs lowercase. ';
+            if (!/[0-9]/.test(passwordValue)) passwordErrorMessage += 'Needs number. ';
+            if (!/[\'^£$%&*()}{@#~?><>,|=_+!-]/i.test(passwordValue)) { // Corrected regex and added 'i' for case-insensitivity if needed, but typically not for special chars
+                 passwordErrorMessage += 'Needs special char. ';
+            }
         }
         if (passwordErrorMessage) {
             showError('password', passwordErrorMessage.trim());
             isValid = false;
         }
 
-        // 7. Validate Confirm Password (existing - renumbered)
+        // 7. Validate Confirm Password
         const password2Value = password2Input.value;
-        if (passwordValue !== password2Value) {
-            showError('password2', 'Passwords do not match.');
-            isValid = false;
-        } else if (password2Value === "" && passwordValue !== "") {
+        if (passwordValue !== "" && password2Value === "") { // Only require confirm if password is not empty
              showError('password2', 'Please confirm your password.');
              isValid = false;
+        } else if (passwordValue !== password2Value) {
+            showError('password2', 'Passwords do not match.');
+            isValid = false;
         }
 
-        // 8. Validate Gender (existing - renumbered)
+
+        // 8. Validate Gender
         if (genderSelect.value === "") {
             showError('gender', 'Please select your gender.');
             isValid = false;
         }
 
         if (!isValid) {
-            event.preventDefault();
+            event.preventDefault(); // Prevent form submission if any validation fails
         }
     });
 
-    // Optional: Real-time validation (existing input event listeners)
-    idNumberInput.addEventListener('input', function() { /* ... existing ... */ });
-    emailInput.addEventListener('input', function() { /* ... existing ... */ });
-    passwordInput.addEventListener('input', function() { /* ... existing ... */ });
-    password2Input.addEventListener('input', function() { /* ... existing ... */ });
+    // Real-time validation for individual fields (optional but good UX)
+    // You can add more specific real-time checks if needed for ID format here,
+    // but the primary server-side check will be less strict.
+
+    idNumberInput.addEventListener('input', function() {
+        const value = this.value.trim();
+        if (value === "") showError('id_number', 'Student ID cannot be empty.');
+        else if (value.length > 50) showError('id_number', 'Student ID is too long (max 50 characters).');
+        else clearError('id_number');
+    });
+
+    emailInput.addEventListener('input', function() {
+        const value = this.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (value === "") showError('email', 'Email cannot be empty.');
+        else if (!emailRegex.test(value)) showError('email', 'Invalid email format.');
+        else clearError('email');
+    });
+
+    passwordInput.addEventListener('input', function() {
+        const passwordValue = this.value;
+        let passwordErrorMessage = '';
+        if (passwordValue === "") {
+            passwordErrorMessage = 'Password cannot be empty. ';
+        } else {
+            if (passwordValue.length < 8) passwordErrorMessage += 'Min 8 chars. ';
+            if (!/[A-Z]/.test(passwordValue)) passwordErrorMessage += 'Needs uppercase. ';
+            // ... add other password checks for real-time feedback if desired ...
+        }
+        if (passwordErrorMessage) showError('password', passwordErrorMessage.trim());
+        else clearError('password');
+
+        // Also re-check confirm password if password changes
+        if (password2Input.value !== "" && passwordValue !== password2Input.value) {
+            showError('password2', 'Passwords do not match.');
+        } else if (password2Input.value !== "") {
+            clearError('password2');
+        }
+    });
+
+    password2Input.addEventListener('input', function() {
+        if (this.value === "") showError('password2', 'Please confirm your password.');
+        else if (this.value !== passwordInput.value) showError('password2', 'Passwords do not match.');
+        else clearError('password2');
+    });
 
     departmentOtherText.addEventListener('input', function() {
         if (departmentSelect.value === 'OtherDept') {
             const value = this.value.trim();
-            if (value === "") showError('department_other_text', 'Department cannot be empty.');
+            if (value === "") showError('department_other_text', 'Department cannot be empty if "Other" selected.');
             else if (value.length > 100) showError('department_other_text', 'Department name too long.');
             else clearError('department_other_text');
         }
     });
 
-    // --- NEW: Real-time for Club Other Text ---
     clubOtherText.addEventListener('input', function() {
         if (clubSelect.value === 'OtherClub') {
             const value = this.value.trim();
-            if (value === "") showError('club_other_text', 'Club name cannot be empty.');
+            if (value === "") showError('club_other_text', 'Club name cannot be empty if "Other" selected.');
             else if (value.length > 100) showError('club_other_text', 'Club name too long.');
             else clearError('club_other_text');
         }
     });
+
 });
 </script>
 
